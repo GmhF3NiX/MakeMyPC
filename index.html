@@ -245,6 +245,9 @@
   .sourcelist{display:flex; flex-wrap:wrap; gap:8px;}
   .sourcelist a{font-size:12px; background:var(--surface-2); border:1px solid var(--border); padding:5px 12px; text-decoration:none; text-transform:uppercase; letter-spacing:.02em;}
   .sourcelist a:hover{border-color:var(--accent-gpu); color:var(--accent-gpu);}
+  .supportlinks{margin-top:8px;}
+  .supportlinks a:first-child{border-color:var(--warn); color:var(--warn);}
+  .supportlinks a:first-child:hover{border-color:var(--warn); color:var(--warn); opacity:.85;}
 
   footer{margin-top:28px; padding-top:16px; border-top:1px solid var(--border); font-size:11px; color:var(--text-faint); display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; font-family:'Share Tech Mono',monospace;}
   footer button{background:none; border:none; color:var(--text-faint); text-decoration:underline; cursor:pointer; font-size:11px; font-family:inherit;}
@@ -269,6 +272,12 @@
 
 <div class="tabs" role="tablist" id="tabNav"></div>
 <main id="panel"></main>
+
+<div class="sourcelist supportlinks">
+  <a href="https://www.paypal.com/paypalme/rapidr3dde" target="_blank" rel="noopener">Unterstützen (PayPal)</a>
+  <a href="https://www.tiktok.com/@rapidr3d" target="_blank" rel="noopener">TikTok</a>
+  <a href="https://rapidr3d.duckdns.org" target="_blank" rel="noopener">Webseite</a>
+</div>
 
 <footer>
   <span id="seedNote"></span>
