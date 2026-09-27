@@ -289,7 +289,7 @@
 (function(){
 "use strict";
 
-var APP_SEED_DATE = "2026-09-26";
+var APP_SEED_DATE = "2026-09-27";
 
 /* ---------------- reference data (static fallback / initial seed) ---------------- */
 /* board-partner variants: three curated real-world tiers per card/board – günstigste, Preis-Leistungs-Sieger (Wertungsanker) und Top-Leistung.
@@ -329,21 +329,21 @@ var CPUS = [
   {id:"cpu-5600", category:"cpu", vendor:"amd", name:"Ryzen 5 5600", socket:"AM4", memType:"ddr4", cores:6, threads:12, tdp:65, index:52, price:105, note:"Günstigster Einstieg, nur mit DDR4-Board nutzbar."},
   {id:"cpu-5700x3d", category:"cpu", vendor:"amd", name:"Ryzen 7 5700X3D", socket:"AM4", memType:"ddr4", cores:8, threads:16, tdp:105, index:70, price:195, note:"3D-Cache auf AM4, gutes Gaming-Preis/Leistungs-Verhältnis."},
   {id:"cpu-5800x3d", category:"cpu", vendor:"amd", name:"Ryzen 7 5800X3D", socket:"AM4", memType:"ddr4", cores:8, threads:16, tdp:105, index:75, price:225, note:"Letzter starker AM4-Gaming-Chip, kein Aufrüstpfad mehr."},
-  {id:"cpu-7500f", category:"cpu", vendor:"amd", name:"Ryzen 5 7500F", socket:"AM5", memType:"ddr5", cores:6, threads:12, tdp:65, index:67, price:140, note:"Kein iGPU, sehr günstiger AM5-Einstieg."},
+  {id:"cpu-7500f", category:"cpu", vendor:"amd", name:"Ryzen 5 7500F", socket:"AM5", memType:"ddr5", cores:6, threads:12, tdp:65, index:67, price:115, note:"Kein iGPU, sehr günstiger AM5-Einstieg. Preis live verifiziert (Geizhals, Sept. 2026)."},
   {id:"cpu-9600x", category:"cpu", vendor:"amd", name:"Ryzen 5 9600X", socket:"AM5", memType:"ddr5", cores:6, threads:12, tdp:65, index:76, price:210, note:"Guter Allrounder-Einstieg auf AM5."},
   {id:"cpu-7700x", category:"cpu", vendor:"amd", name:"Ryzen 7 7700X", socket:"AM5", memType:"ddr5", cores:8, threads:16, tdp:105, index:80, price:280, note:"Mehr Kerne, ohne 3D-Cache."},
   {id:"cpu-9700x", category:"cpu", vendor:"amd", name:"Ryzen 7 9700X", socket:"AM5", memType:"ddr5", cores:8, threads:16, tdp:65, index:82, price:330, note:"Effizient, 8 Kerne."},
-  {id:"cpu-7800x3d", category:"cpu", vendor:"amd", name:"Ryzen 7 7800X3D", socket:"AM5", memType:"ddr5", cores:8, threads:16, tdp:120, index:93, price:350, note:"Bestes Gaming-Preis/Leistungs-Verhältnis auf AM5."},
-  {id:"cpu-9800x3d", category:"cpu", vendor:"amd", name:"Ryzen 7 9800X3D", socket:"AM5", memType:"ddr5", cores:8, threads:16, tdp:120, index:100, price:480, note:"Schnellste Gaming-CPU im Feld – Referenzwert (Index 100)."},
+  {id:"cpu-7800x3d", category:"cpu", vendor:"amd", name:"Ryzen 7 7800X3D", socket:"AM5", memType:"ddr5", cores:8, threads:16, tdp:120, index:93, price:285, note:"Bestes Gaming-Preis/Leistungs-Verhältnis auf AM5. Preis live verifiziert (Geizhals, 25.09.2026)."},
+  {id:"cpu-9800x3d", category:"cpu", vendor:"amd", name:"Ryzen 7 9800X3D", socket:"AM5", memType:"ddr5", cores:8, threads:16, tdp:120, index:100, price:387, note:"Schnellste Gaming-CPU im Feld – Referenzwert (Index 100). Preis live verifiziert (Geizhals, 26.09.2026)."},
   {id:"cpu-9900x", category:"cpu", vendor:"amd", name:"Ryzen 9 9900X", socket:"AM5", memType:"ddr5", cores:12, threads:24, tdp:120, index:86, price:430, note:"Mehr Kerne, eher für Streaming/Produktivität."},
-  {id:"cpu-9950x3d", category:"cpu", vendor:"amd", name:"Ryzen 9 9950X3D", socket:"AM5", memType:"ddr5", cores:16, threads:32, tdp:170, index:99, price:650, note:"3D-Cache plus 16 Kerne, Gaming und Produktivität."},
+  {id:"cpu-9950x3d", category:"cpu", vendor:"amd", name:"Ryzen 9 9950X3D", socket:"AM5", memType:"ddr5", cores:16, threads:32, tdp:170, index:99, price:575, note:"3D-Cache plus 16 Kerne, Gaming und Produktivität. Preis live verifiziert (Geizhals, Sept. 2026)."},
   {id:"cpu-i3-12100f", category:"cpu", vendor:"intel", name:"Core i3-12100F", socket:"LGA1700", memType:"ddr4", cores:4, threads:8, tdp:60, index:48, price:110, note:"Günstigster Intel-Einstieg, kein Übertakten."},
   {id:"cpu-i5-12400f", category:"cpu", vendor:"intel", name:"Core i5-12400F", socket:"LGA1700", memType:"ddr4", cores:6, threads:12, tdp:65, index:58, price:130, note:"Solider Budget-Allrounder."},
-  {id:"cpu-i5-14600kf", category:"cpu", vendor:"intel", name:"Core i5-14600KF", socket:"LGA1700", memType:"ddr5", cores:14, threads:20, tdp:125, index:85, price:270, note:"Unlocked, starkes Gaming-Preis/Leistungs-Verhältnis."},
-  {id:"cpu-i7-14700kf", category:"cpu", vendor:"intel", name:"Core i7-14700KF", socket:"LGA1700", memType:"ddr5", cores:20, threads:28, tdp:125, index:90, price:380, note:"Viele Kerne, gut für Gaming und Multitasking."},
+  {id:"cpu-i5-14600kf", category:"cpu", vendor:"intel", name:"Core i5-14600KF", socket:"LGA1700", memType:"ddr5", cores:14, threads:20, tdp:125, index:85, price:234, note:"Unlocked, starkes Gaming-Preis/Leistungs-Verhältnis. Preis live verifiziert (Geizhals, Sept. 2026)."},
+  {id:"cpu-i7-14700kf", category:"cpu", vendor:"intel", name:"Core i7-14700KF", socket:"LGA1700", memType:"ddr5", cores:20, threads:28, tdp:125, index:90, price:320, note:"Viele Kerne, gut für Gaming und Multitasking. Preis live verifiziert (Geizhals, Sept. 2026)."},
   {id:"cpu-i9-14900kf", category:"cpu", vendor:"intel", name:"Core i9-14900KF", socket:"LGA1700", memType:"ddr5", cores:24, threads:32, tdp:125, index:94, price:480, note:"Sehr schnell, aber hoher Verbrauch unter Volllast."},
-  {id:"cpu-ultra5-245k", category:"cpu", vendor:"intel", name:"Core Ultra 5 245K", socket:"LGA1851", memType:"ddr5", cores:14, threads:14, tdp:125, index:83, price:300, note:"Neue Plattform (Arrow Lake), effizienter als 14. Gen."},
-  {id:"cpu-ultra7-265k", category:"cpu", vendor:"intel", name:"Core Ultra 7 265K", socket:"LGA1851", memType:"ddr5", cores:20, threads:20, tdp:125, index:88, price:420, note:"Neue Plattform (Arrow Lake), viele Kerne."}
+  {id:"cpu-ultra5-245k", category:"cpu", vendor:"intel", name:"Core Ultra 5 245K", socket:"LGA1851", memType:"ddr5", cores:14, threads:14, tdp:125, index:83, price:180, note:"Neue Plattform (Arrow Lake), effizienter als 14. Gen. Preis deutlich gefallen – live verifiziert (Geizhals, Sept. 2026)."},
+  {id:"cpu-ultra7-265k", category:"cpu", vendor:"intel", name:"Core Ultra 7 265K", socket:"LGA1851", memType:"ddr5", cores:20, threads:20, tdp:125, index:88, price:303, note:"Neue Plattform (Arrow Lake), viele Kerne. Preis deutlich gefallen – live verifiziert (Geizhals, Sept. 2026)."}
 ];
 var GPUS = [
   {id:"gpu-6600", category:"gpu", vendor:"amd", name:"Radeon RX 6600", vram:8, tdp:132, index:40, price:210, note:"Einsteiger für Full HD.", models:mkGpuModels(210,"amd")},
@@ -352,12 +352,12 @@ var GPUS = [
   {id:"gpu-7600", category:"gpu", vendor:"amd", name:"Radeon RX 7600", vram:8, tdp:165, index:48, price:260, note:"Einsteiger, wenig VRAM.", models:mkGpuModels(260,"amd")},
   {id:"gpu-7600xt", category:"gpu", vendor:"amd", name:"Radeon RX 7600 XT", vram:16, tdp:190, index:54, price:320, note:"16 GB VRAM zum günstigen Preis.", models:mkGpuModels(320,"amd")},
   {id:"gpu-7700xt", category:"gpu", vendor:"amd", name:"Radeon RX 7700 XT", vram:12, tdp:245, index:66, price:420, note:"Guter WQHD-Einstieg.", models:mkGpuModels(420,"amd")},
-  {id:"gpu-7800xt", category:"gpu", vendor:"amd", name:"Radeon RX 7800 XT", vram:16, tdp:263, index:77, price:510, note:"Sehr gutes WQHD-Preis/Leistungs-Verhältnis.", models:mkGpuModels(510,"amd")},
+  {id:"gpu-7800xt", category:"gpu", vendor:"amd", name:"Radeon RX 7800 XT", vram:16, tdp:263, index:77, price:680, note:"Sehr gutes WQHD-Preis/Leistungs-Verhältnis. Karte wird knapp (EOL), Preis gestiegen – live verifiziert (Geizhals, Sept. 2026).", models:mkGpuModels(680,"amd")},
   {id:"gpu-7900xt", category:"gpu", vendor:"amd", name:"Radeon RX 7900 XT", vram:20, tdp:315, index:89, price:670, note:"Starke WQHD/4K-Karte.", models:mkGpuModels(670,"amd")},
   {id:"gpu-7900xtx", category:"gpu", vendor:"amd", name:"Radeon RX 7900 XTX", vram:24, tdp:355, index:97, price:820, note:"Viel VRAM, älteres FSR ohne volles FSR 4.", models:mkGpuModels(820,"amd")},
   {id:"gpu-9070", category:"gpu", vendor:"amd", name:"Radeon RX 9070", vram:16, tdp:220, index:87, price:640, note:"Effizient, volles FSR 4.", models:mkGpuModels(640,"amd")},
   {id:"gpu-9070xt", category:"gpu", vendor:"amd", name:"Radeon RX 9070 XT", vram:16, tdp:304, index:100, price:779, note:"Bestes P/L in 4K, FSR 4 – Referenzwert (Index 100). Preis-Leistungs-Sieger-Preis ist dein eigener Fund (XFX Swift).", models:mkGpuModels(779,"amd"), defaultModel:1},
-  {id:"gpu-4060", category:"gpu", vendor:"nvidia", name:"GeForce RTX 4060", vram:8, tdp:115, index:50, price:375, note:"Einsteiger Full HD, DLSS 3.", models:mkGpuModels(375,"nvidia")},
+  {id:"gpu-4060", category:"gpu", vendor:"nvidia", name:"GeForce RTX 4060", vram:8, tdp:115, index:50, price:700, note:"Einsteiger Full HD, DLSS 3. Durch die Speicherkrise stark verteuert (fast verdoppelt) – live verifiziert (Geizhals, Sept. 2026).", models:mkGpuModels(700,"nvidia")},
   {id:"gpu-4060ti16", category:"gpu", vendor:"nvidia", name:"GeForce RTX 4060 Ti 16GB", vram:16, tdp:160, index:58, price:525, note:"Mehr VRAM als die 8-GB-Version.", models:mkGpuModels(525,"nvidia")},
   {id:"gpu-4070", category:"gpu", vendor:"nvidia", name:"GeForce RTX 4070", vram:12, tdp:200, index:72, price:675, note:"Guter WQHD-Allrounder, DLSS 3.", models:mkGpuModels(675,"nvidia")},
   {id:"gpu-4070super", category:"gpu", vendor:"nvidia", name:"GeForce RTX 4070 Super", vram:12, tdp:220, index:80, price:750, note:"Spürbar schneller als die reguläre 4070.", models:mkGpuModels(750,"nvidia")},
@@ -367,19 +367,21 @@ var GPUS = [
   {id:"gpu-5070", category:"gpu", vendor:"nvidia", name:"GeForce RTX 5070", vram:12, tdp:250, index:85, price:750, note:"Neue Generation, DLSS 4.", models:mkGpuModels(750,"nvidia")},
   {id:"gpu-5070ti", category:"gpu", vendor:"nvidia", name:"GeForce RTX 5070 Ti", vram:16, tdp:300, index:102, price:1137, note:"Sehr gutes 4K-Preis/Leistungs-Verhältnis in der neuen Generation. Preis live verifiziert (PCGH, 11.09.2026).", models:mkGpuModels(1137,"nvidia")},
   {id:"gpu-5080", category:"gpu", vendor:"nvidia", name:"GeForce RTX 5080", vram:16, tdp:360, index:118, price:1350, note:"High-End, DLSS 4 mit Multi Frame Generation. Preis live verifiziert (PCGH, 11.09.2026).", models:mkGpuModels(1350,"nvidia")},
-  {id:"gpu-5090", category:"gpu", vendor:"nvidia", name:"GeForce RTX 5090", vram:32, tdp:575, index:155, price:2750, note:"Enthusiasten-Flaggschiff, sprengt fast jedes Budget.", models:mkGpuModels(2750,"nvidia")},
+  {id:"gpu-5090", category:"gpu", vendor:"nvidia", name:"GeForce RTX 5090", vram:32, tdp:575, index:155, price:5250, note:"Enthusiasten-Flaggschiff, sprengt fast jedes Budget. Wegen KI-Nachfrage nach Speicherchips über 5.000 EUR gestiegen – live verifiziert (Geizhals/Hardwareluxx/ComputerBase, Sept. 2026).", models:mkGpuModels(5250,"nvidia")},
   {id:"gpu-arc-a750", category:"gpu", vendor:"intel", name:"Arc A750", vram:8, tdp:225, index:42, price:220, note:"Günstig, in älteren DX11-Titeln oft schwächer als der Index zeigt.", models:mkGpuModels(220,"intel")},
   {id:"gpu-arc-a770", category:"gpu", vendor:"intel", name:"Arc A770 16GB", vram:16, tdp:225, index:48, price:280, note:"Viel VRAM für den Preis, Treiber am besten in DX12/Vulkan-Titeln.", models:mkGpuModels(280,"intel")},
   {id:"gpu-arc-b570", category:"gpu", vendor:"intel", name:"Arc B570", vram:10, tdp:150, index:50, price:277, note:"Neue Battlemage-Generation, effizient, gutes DX12/Vulkan-Verhalten. Preis live verifiziert (Sept. 2026).", models:mkGpuModels(277,"intel")},
   {id:"gpu-arc-b580", category:"gpu", vendor:"intel", name:"Arc B580", vram:12, tdp:190, index:57, price:319, note:"Bestes Preis/Leistungs-Verhältnis der Arc-Reihe, in DX11-Spielen (z. B. ältere Titel) manchmal hinter dem Index. Preis live verifiziert (Sept. 2026).", models:mkGpuModels(319,"intel")}
 ];
-/* Preise Stand 26.09.2026, per WebSearch verifiziert bzw. auf Basis von ~16,5 EUR/GiB (DDR5) und
+/* Preise Stand 27.09.2026, per WebSearch verifiziert bzw. auf Basis von ~16,5 EUR/GiB (DDR5) und
    ~6,6 EUR/GiB (DDR4) hochgerechnet – die RAM-Krise 2026 hat die Preise binnen weniger Monate
-   auf teils das Vierfache getrieben (Quelle: 3dcenter.org Speicherkrise-Preisindex, PCGH). */
+   auf teils das Vierfache getrieben (Quelle: 3dcenter.org Speicherkrise-Preisindex, PCGH) und hält
+   laut 3dcenter.org (Speicherkrise-Preisindex, Sept. 2026) unvermindert an – keine Entspannung
+   vor Mitte 2027 in Sicht. */
 var RAM = [
   {id:"ram-ddr4-16-3600", category:"ram", brand:"Kingston", name:"Kingston Fury Beast 16 GB (2×8) DDR4-3600 CL17", memType:"ddr4", capacity:16, speed:3600, cl:17, price:105, note:"Für AM4- oder ältere Intel-Boards."},
-  {id:"ram-ddr4-32-3600", category:"ram", brand:"Kingston", name:"Kingston Fury Beast 32 GB (2×16) DDR4-3600 CL17", memType:"ddr4", capacity:32, speed:3600, cl:17, price:210, note:"Für AM4- oder ältere Intel-Boards."},
-  {id:"ram-ddr4-32-corsair", category:"ram", brand:"Corsair", name:"Corsair Vengeance LPX 32 GB (2×16) DDR4-3600 CL18", memType:"ddr4", capacity:32, speed:3600, cl:18, price:215, note:"Alternative zum Kingston-Kit, etwas lockerere Timings."},
+  {id:"ram-ddr4-32-3600", category:"ram", brand:"Kingston", name:"Kingston Fury Beast 32 GB (2×16) DDR4-3600 CL17", memType:"ddr4", capacity:32, speed:3600, cl:17, price:289, note:"Für AM4- oder ältere Intel-Boards. Speicherkrise treibt DDR4-Preise weiter – live verifiziert (Geizhals, Sept. 2026)."},
+  {id:"ram-ddr4-32-corsair", category:"ram", brand:"Corsair", name:"Corsair Vengeance LPX 32 GB (2×16) DDR4-3600 CL18", memType:"ddr4", capacity:32, speed:3600, cl:18, price:270, note:"Alternative zum Kingston-Kit, etwas lockerere Timings. Live verifiziert (Geizhals, Sept. 2026)."},
   {id:"ram-ddr5-16-6000", category:"ram", brand:"Kingston", name:"Kingston Fury Beast 16 GB (2×8) DDR5-6000 CL36 EXPO", memType:"ddr5", capacity:16, speed:6000, cl:36, price:264, note:"Günstiger DDR5-Einstieg – auch hier trifft die RAM-Krise 2026 den Preis."},
   {id:"ram-ddr5-32-teamgroup", category:"ram", brand:"TeamGroup", name:"TeamGroup T-Force Vulcan 32 GB (2×16) DDR5-6000 CL38 EXPO", memType:"ddr5", capacity:32, speed:6000, cl:38, price:496, note:"Günstigste 32-GB-Option, lockerere Timings (CL38)."},
   {id:"ram-ddr5-32-5600", category:"ram", brand:"Corsair", name:"Corsair Vengeance 32 GB (2×16) DDR5-5600 CL36 EXPO", memType:"ddr5", capacity:32, speed:5600, cl:36, price:512, note:"Niedrigerer Takt (5600 statt 6000), meist etwas günstiger."},
@@ -402,16 +404,18 @@ var BOARDS = [
   {id:"board-b860", category:"board", name:"B860", socket:"LGA1851", memType:"ddr5", chipset:"B860", price:180, note:"Für Core Ultra 200S (Arrow Lake).", models:mkBoardModels(180)},
   {id:"board-z890", category:"board", name:"Z890 (High-End)", socket:"LGA1851", memType:"ddr5", chipset:"Z890", price:260, note:"High-End für Core Ultra 200S.", models:mkBoardModels(260)}
 ];
-/* Preise Stand 26.09.2026. SN770 1TB live per WebSearch verifiziert (Geizhals, 13.09.2026: 248,84 EUR);
-   die übrigen Laufwerke sind anhand dieses Ankers hochgerechnet (SSD-Preise pro TB liegen laut
-   PCGH/ComputerBase 2026 krisenbedingt beim Vierfachen des Vorkrisenniveaus). */
+/* Preise Stand 27.09.2026. SN770 1TB live per WebSearch verifiziert (Geizhals, 13.09.2026: 248,84 EUR);
+   Samsung 990 EVO Plus 1TB ebenfalls live verifiziert (Geizhals, Sept. 2026, ~150-180 EUR je nach
+   Händler); die übrigen Laufwerke sind anhand des SN770-Ankers hochgerechnet (SSD-Preise pro TB
+   steigen laut PCGH/ComputerBase 2026 weiter, krisenbedingt durch NAND-Knappheit – keine
+   Entspannung vor Ende 2026 erwartet). */
 var STORAGE = [
   {id:"storage-a400-480", category:"storage", name:"Kingston A400 480GB", interface:"SATA", capacity:480, price:72, note:"SATA, gut als Zweitlaufwerk oder für ältere Boards."},
   {id:"storage-870evo-1tb", category:"storage", name:"Samsung 870 EVO 1TB", interface:"SATA", capacity:1000, price:180, note:"Bewährte SATA-SSD, breite Kompatibilität."},
   {id:"storage-nv3-500", category:"storage", name:"Kingston NV3 500GB", interface:"PCIe4", capacity:500, price:110, note:"Günstiger Einstieg, reicht für Windows + wenige Spiele."},
   {id:"storage-p3plus-1tb", category:"storage", name:"Crucial P3 Plus 1TB", interface:"PCIe4", capacity:1000, price:220, note:"Guter Basis-Speicher für Windows + Spielebibliothek."},
   {id:"storage-sn770-1tb", category:"storage", name:"WD Black SN770 1TB", interface:"PCIe4", capacity:1000, price:248.84, note:"Beliebt fürs Gaming, gute Dauerlast. Preis live verifiziert."},
-  {id:"storage-990evoplus-1tb", category:"storage", name:"Samsung 990 EVO Plus 1TB", interface:"PCIe4/5", capacity:1000, price:290, note:"Hybrid-Controller, nutzt PCIe 5.0 teilweise."},
+  {id:"storage-990evoplus-1tb", category:"storage", name:"Samsung 990 EVO Plus 1TB", interface:"PCIe4/5", capacity:1000, price:165, note:"Hybrid-Controller, nutzt PCIe 5.0 teilweise. Preis nach unten korrigiert – live verifiziert (Geizhals, Sept. 2026, größere Preisspanne je Händler)."},
   {id:"storage-t500-2tb", category:"storage", name:"Crucial T500 2TB", interface:"PCIe4", capacity:2000, price:480, note:"Schnelles PCIe-4.0-Laufwerk mit viel Platz."},
   {id:"storage-sn850x-2tb", category:"storage", name:"WD Black SN850X 2TB", interface:"PCIe4", capacity:2000, price:540, note:"Premium-Gaming-SSD, sehr gute Temperaturen."},
   {id:"storage-990pro-2tb", category:"storage", name:"Samsung 990 Pro 2TB", interface:"PCIe4", capacity:2000, price:560, note:"Referenz für PCIe-4.0-Performance."},
