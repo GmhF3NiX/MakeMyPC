@@ -1,0 +1,1195 @@
+<title>MakeMyPC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  /* Committed dark neon world (Cyberpunk-menu aesthetic) – no light variant by design. */
+  :root{
+    --bg:#0a0a0d;
+    --bg-glow-a:#ff2a6d;
+    --bg-glow-b:#00f6ff;
+    --surface:#131318;
+    --surface-2:#1b1b22;
+    --border:#33333d;
+    --border-bright:#54545f;
+    --text:#eef0f2;
+    --text-dim:#9a9aa8;
+    --text-faint:#68687a;
+    --accent-cpu:#ff2a6d;
+    --accent-cpu-bg:#ff2a6d1f;
+    --accent-gpu:#00f6ff;
+    --accent-gpu-bg:#00f6ff1f;
+    --good:#05ffa1;
+    --good-bg:#05ffa11f;
+    --warn:#fcee09;
+    --warn-bg:#fcee091f;
+    --bad:#ff2247;
+    --bad-bg:#ff224722;
+    --value:#fcee09;
+    --value-bg:#fcee091a;
+    --radius:2px;
+    --cut:14px;
+    --shadow:0 0 0 1px rgba(255,255,255,.02), 0 10px 26px -14px rgba(0,0,0,.7);
+    color-scheme:dark;
+  }
+
+  *{box-sizing:border-box;}
+  html{background:var(--bg);}
+  body{
+    background:
+      radial-gradient(ellipse 900px 500px at 8% -8%, color-mix(in srgb, var(--bg-glow-a) 16%, transparent), transparent 60%),
+      radial-gradient(ellipse 900px 600px at 100% 0%, color-mix(in srgb, var(--bg-glow-b) 14%, transparent), transparent 60%),
+      repeating-linear-gradient(0deg, rgba(255,255,255,.018) 0px, rgba(255,255,255,.018) 1px, transparent 1px, transparent 3px),
+      var(--bg);
+    color:var(--text);
+    font-family:'Rajdhani',system-ui,sans-serif;
+    font-size:15px;
+    padding-inline:16px;
+    padding-block:16px;
+    max-width:1180px;
+    margin:0 auto;
+  }
+  h1,h2,h3{font-family:'Chakra Petch',ui-monospace,monospace; letter-spacing:.01em; text-wrap:balance; text-transform:uppercase;}
+  .mono{font-family:'Share Tech Mono',ui-monospace,monospace;}
+  .tabular{font-family:'Share Tech Mono',ui-monospace,monospace; font-variant-numeric:tabular-nums;}
+  a{color:inherit;}
+  button{font-family:'Chakra Petch',inherit;}
+  select{font-family:'Chakra Petch',inherit;}
+  ::selection{background:var(--accent-gpu); color:#0a0a0d;}
+
+  /* ---- top bar ---- */
+  .topbar{
+    display:flex; flex-wrap:wrap; gap:14px 20px; align-items:flex-end;
+    justify-content:space-between; padding-bottom:16px; margin-bottom:16px;
+    border-bottom:1px solid var(--border);
+  }
+  .brand h1{font-size:26px; margin:0 0 4px; font-weight:700; color:var(--warn); text-shadow:0 0 18px color-mix(in srgb, var(--warn) 55%, transparent);}
+  .brand p{margin:0; color:var(--text-dim); font-size:13px; max-width:50ch;}
+  .budgetbox{
+    display:flex; align-items:stretch; gap:10px; flex-wrap:wrap;
+  }
+  .field{
+    display:flex; flex-direction:column; gap:4px;
+  }
+  .field label{font-size:11px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.08em;}
+  .field input[type="number"]{
+    font-family:'Share Tech Mono',monospace; font-size:15px; font-weight:600;
+    background:var(--surface-2); border:1px solid var(--border); color:var(--text);
+    padding:7px 10px; width:110px;
+  }
+  .field input[type="number"]:focus{outline:none; border-color:var(--accent-gpu);}
+  .totalpill{
+    display:flex; flex-direction:column; gap:4px; justify-content:center;
+    background:var(--surface); border:1px solid var(--border);
+    padding:7px 14px; min-width:160px;
+  }
+  .totalpill .amount{font-family:'Share Tech Mono',monospace; font-size:19px; font-weight:700;}
+  .totalpill .delta{font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.02em;}
+  .status-ok{color:var(--good);} .status-warn{color:var(--warn);} .status-bad{color:var(--bad);}
+
+  /* corner-cut "cyberpunk panel" shape, reused everywhere a surface appears */
+  .cut{clip-path:polygon(0 0, calc(100% - var(--cut)) 0, 100% var(--cut), 100% 100%, var(--cut) 100%, 0 calc(100% - var(--cut)));}
+  .cut-sm{--cut:8px;}
+
+  /* ---- tabs ---- */
+  .tabs{
+    display:flex; gap:2px; background:var(--surface-2); border:1px solid var(--border);
+    padding:4px; margin-bottom:20px; overflow-x:auto;
+  }
+  .tabs button{
+    appearance:none; border:none; background:transparent; color:var(--text-dim);
+    font-size:13px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; padding:9px 16px; cursor:pointer;
+    white-space:nowrap; transition:background .15s, color .15s;
+  }
+  .tabs button[aria-selected="true"]{background:var(--accent-gpu); color:#04181a;}
+  .tabs button:focus-visible{outline:2px solid var(--accent-gpu); outline-offset:2px;}
+
+  section[role="tabpanel"]{display:flex; flex-direction:column; gap:28px;}
+
+  /* ---- component category block ---- */
+  .catblock + .catblock{border-top:1px solid var(--border); padding-top:26px;}
+  .catblock .catheader{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; margin-bottom:14px;}
+  .catblock h2{font-size:24px; letter-spacing:.06em; margin:0; color:var(--accent-gpu); font-weight:700; text-shadow:0 0 16px color-mix(in srgb, var(--accent-gpu) 45%, transparent);}
+  .catblock h2::before{content:"// "; color:var(--text-faint);}
+  .catcontrols{display:flex; gap:8px; align-items:center; flex-wrap:wrap;}
+  .vendorfilter{display:inline-flex; border:1px solid var(--border);}
+  .vendorfilter button{appearance:none; border:none; background:var(--surface); color:var(--text-dim); font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.03em; padding:5px 10px; cursor:pointer;}
+  .vendorfilter button + button{border-left:1px solid var(--border);}
+  .vendorfilter button[aria-pressed="true"]{background:var(--accent-cpu); color:#1a0208;}
+  .sortselect{font-size:11px; font-weight:600; text-transform:uppercase; background:var(--surface); border:1px solid var(--border); color:var(--text-dim); padding:5px 8px;}
+
+  .cardgrid{
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:10px;
+  }
+  .card{
+    text-align:left; border:1px solid var(--border); background:var(--surface);
+    padding:12px; cursor:pointer; display:flex; flex-direction:column; gap:8px; position:relative;
+    transition:border-color .15s;
+  }
+  .card:hover{border-color:var(--border-bright);}
+  .card:focus-visible{outline:2px solid var(--accent-gpu); outline-offset:2px;}
+  .card.selected{border-color:var(--accent-gpu); box-shadow:0 0 0 1px var(--accent-gpu), 0 0 18px -6px var(--accent-gpu);}
+  .card.selected.cpu-sel{border-color:var(--accent-cpu); box-shadow:0 0 0 1px var(--accent-cpu), 0 0 18px -6px var(--accent-cpu);}
+  .card .toprow{display:flex; justify-content:space-between; align-items:flex-start; gap:6px;}
+  .cardicon{width:34px; height:34px; flex:none; background:var(--surface-2); border:1px solid var(--border); padding:5px;}
+  .cardicon svg{width:100%; height:100%; display:block;}
+  .cardicon.cpu{color:var(--accent-cpu);}
+  .cardicon.gpu{color:var(--accent-gpu);}
+  .cardicon.ram, .cardicon.board{color:var(--text-faint);}
+  .nameblock{display:flex; align-items:center; gap:8px; min-width:0;}
+  .card .name{font-weight:600; font-size:14px; font-family:'Chakra Petch',sans-serif;}
+  .vendortag{font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:var(--bg); background:var(--text-dim); padding:2px 6px; flex:none;}
+  .card .chips{display:flex; flex-wrap:wrap; gap:5px;}
+  .chip{font-size:11px; font-family:'Share Tech Mono',monospace; background:var(--surface-2); border:1px solid var(--border); padding:2px 6px; color:var(--text-dim);}
+  .idxbar-track{height:6px; background:var(--surface-2); overflow:hidden;}
+  .idxbar-fill{height:100%;}
+  .idxbar-fill.cpu{background:var(--accent-cpu); box-shadow:0 0 8px var(--accent-cpu);}
+  .idxbar-fill.gpu{background:var(--accent-gpu); box-shadow:0 0 8px var(--accent-gpu);}
+  .card .note{font-size:12px; color:var(--text-faint); line-height:1.35;}
+  .valuebadge{align-self:flex-start; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.03em; color:var(--value); background:var(--value-bg); border:1px solid var(--value); padding:2px 6px;}
+  .modelpicker{display:flex; border:1px solid var(--border); overflow:hidden; align-self:flex-start; flex-wrap:wrap;}
+  .modelpicker button{appearance:none; border:none; background:var(--surface-2); color:var(--text-dim); font-size:11px; font-weight:600; padding:5px 9px; cursor:pointer; font-family:'Share Tech Mono',monospace;}
+  .modelpicker button + button{border-left:1px solid var(--border);}
+  .modelpicker button[aria-pressed="true"]{background:var(--warn); color:#1a1400;}
+  .pricerow{display:flex; align-items:center; gap:6px; margin-top:auto;}
+  .pricerow input[type="number"]{
+    width:80px; font-family:'Share Tech Mono',monospace; font-size:13px; font-weight:700;
+    background:var(--surface-2); border:1px solid var(--border); color:var(--text); padding:4px 6px;
+  }
+  .pricerow .eur{font-size:12px; color:var(--text-faint);}
+  .pricerow .resetbtn{
+    margin-left:auto; font-size:11px; color:var(--text-faint); background:none; border:none; cursor:pointer; text-decoration:underline;
+  }
+  .searchlink{font-size:11px; color:var(--accent-gpu); text-decoration:none; font-weight:700; text-transform:uppercase; letter-spacing:.02em;}
+  .searchlink:hover{text-decoration:underline;}
+  .pricedate{font-size:10px; color:var(--text-faint); font-family:'Share Tech Mono',monospace;}
+
+  .noticebar{
+    display:flex; gap:10px; align-items:flex-start; padding:10px 12px;
+    font-size:13px; line-height:1.4; border-left:3px solid;
+  }
+  .noticebar.warn{background:var(--warn-bg); color:var(--warn); border-color:var(--warn);}
+  .noticebar.info{background:var(--surface-2); color:var(--text-dim); border-color:var(--accent-gpu);}
+
+  /* ---- overview / hero ---- */
+  .herocard{background:var(--surface); border:1px solid var(--border-bright); padding:20px; display:flex; flex-direction:column; gap:14px;}
+  .herotop{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;}
+  .herolabel{font-size:15px; margin:0; color:var(--warn); letter-spacing:.08em;}
+  .heromgrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:10px;}
+  .heromini{display:flex; align-items:center; gap:10px; background:var(--surface-2); border:1px solid var(--border); padding:8px 10px;}
+  .herominitext{display:flex; flex-direction:column; gap:2px; min-width:0;}
+  .heromininame{font-size:12.5px; font-weight:600; font-family:'Chakra Petch',sans-serif; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .herominiprice{font-size:12px; color:var(--accent-gpu);}
+  .budgetbar{height:14px; background:var(--surface-2); border:1px solid var(--border); position:relative; overflow:hidden;}
+  .budgetbar-fill{height:100%; transition:width .2s;}
+  .budgetline{display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; font-size:13px;}
+  .budgetline > span:first-child{font-size:20px; font-weight:700; color:var(--text);}
+  .jumplink{appearance:none; border:none; background:none; color:var(--accent-gpu); font-weight:700; font-size:inherit; cursor:pointer; text-decoration:underline; padding:0; font-family:'Chakra Petch',sans-serif;}
+  .quickgrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px;}
+  .quicktile{background:var(--surface); border:1px solid var(--border); padding:16px; display:flex; flex-direction:column; gap:4px;}
+  .quicklabel{font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--text-faint);}
+  .quickbig{font-family:'Share Tech Mono',monospace; font-size:30px; font-weight:700; color:var(--accent-cpu); text-shadow:0 0 14px color-mix(in srgb, var(--accent-cpu) 55%, transparent);}
+  .quicksub{font-size:12px; color:var(--text-dim); margin-bottom:6px;}
+
+  /* ---- summary card ---- */
+  .summarycard{
+    background:var(--surface); border:1px solid var(--border); padding:16px;
+    display:flex; flex-direction:column; gap:10px;
+  }
+  .summarygrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px;}
+  .summarygrid .item{display:flex; flex-direction:column; gap:2px;}
+  .summarygrid .item .k{font-size:11px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.05em;}
+  .summarygrid .item .v{font-size:13px; font-weight:700;}
+  .exportrow{display:flex; align-items:center; gap:12px; flex-wrap:wrap; padding-top:10px; border-top:1px solid var(--border);}
+  .exportbtn{appearance:none; border:1px solid var(--warn); background:var(--warn); color:#1a1400; font-weight:700; font-size:13px; text-transform:uppercase; letter-spacing:.04em; padding:9px 16px; cursor:pointer;}
+  .exportbtn:hover{box-shadow:0 0 16px -4px var(--warn);}
+  .exportbtn:disabled{opacity:.5; cursor:default; box-shadow:none;}
+  .exportstatus{font-size:12px; color:var(--text-dim); font-family:'Share Tech Mono',monospace;}
+
+  /* ---- packages ---- */
+  .pkggrid{display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:12px;}
+  .pkgcard{background:var(--surface); border:1px solid var(--border); padding:16px; display:flex; flex-direction:column; gap:10px;}
+  .pkgcard h3{font-size:15px; margin:0; color:var(--accent-cpu);}
+  .pkgcard .blurb{font-size:12px; color:var(--text-dim); line-height:1.4; min-height:2.6em;}
+  .pkgcard .parts{display:flex; flex-direction:column; gap:3px; font-size:12px; color:var(--text-dim);}
+  .pkgcard .parts b{color:var(--text); font-weight:700;}
+  .pkgcard .total{font-family:'Share Tech Mono',monospace; font-size:22px; font-weight:700;}
+  .pkgcard .applybtn{appearance:none; border:1px solid var(--accent-gpu); background:var(--accent-gpu); color:#04181a; font-weight:700; font-size:13px; text-transform:uppercase; letter-spacing:.04em; padding:9px 12px; cursor:pointer;}
+  .pkgcard .applybtn:hover{box-shadow:0 0 16px -4px var(--accent-gpu);}
+
+  /* ---- segmented (resolution) ---- */
+  .seg{display:inline-flex; border:1px solid var(--border);}
+  .seg button{appearance:none; border:none; background:var(--surface); color:var(--text-dim); font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.03em; padding:7px 13px; cursor:pointer;}
+  .seg button + button{border-left:1px solid var(--border);}
+  .seg button[aria-pressed="true"]{background:var(--accent-gpu); color:#04181a;}
+
+  /* ---- psu ---- */
+  .psugrid{display:grid; grid-template-columns:1.1fr 1fr; gap:18px;}
+  @media (max-width:720px){.psugrid{grid-template-columns:1fr;}}
+  .psucard{background:var(--surface); border:1px solid var(--border); padding:18px; display:flex; flex-direction:column; gap:14px;}
+  .drawline{display:flex; justify-content:space-between; font-size:13px; padding:6px 0; border-bottom:1px dashed var(--border);}
+  .drawline .k{color:var(--text-dim);}
+  .drawline .v{font-family:'Share Tech Mono',monospace; font-weight:700;}
+  .psubig{font-family:'Share Tech Mono',monospace; font-size:34px; font-weight:700; color:var(--accent-gpu); text-shadow:0 0 14px color-mix(in srgb, var(--accent-gpu) 60%, transparent);}
+  .slider{display:flex; flex-direction:column; gap:6px;}
+  .slider input[type=range]{width:100%; accent-color:var(--accent-gpu);}
+  .slider .row{display:flex; justify-content:space-between; font-size:12px; color:var(--text-dim);}
+
+  /* ---- fps tiles ---- */
+  .fpsgrid{display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:12px;}
+  .fpstile{background:var(--surface); border:1px solid var(--border); padding:18px 16px; display:flex; flex-direction:column; gap:4px;}
+  .fpsnum{font-family:'Share Tech Mono',monospace; font-size:36px; font-weight:700; color:var(--accent-gpu); line-height:1; text-shadow:0 0 14px color-mix(in srgb, var(--accent-gpu) 60%, transparent);}
+  .fpsunit{font-size:14px; font-weight:700; color:var(--text-faint); margin-left:6px; text-shadow:none;}
+  .fpsgame{font-size:13px; color:var(--text-dim); font-weight:600; text-transform:uppercase; letter-spacing:.02em;}
+
+  .sourcelist{display:flex; flex-wrap:wrap; gap:8px;}
+  .sourcelist a{font-size:12px; background:var(--surface-2); border:1px solid var(--border); padding:5px 12px; text-decoration:none; text-transform:uppercase; letter-spacing:.02em;}
+  .sourcelist a:hover{border-color:var(--accent-gpu); color:var(--accent-gpu);}
+
+  footer{margin-top:28px; padding-top:16px; border-top:1px solid var(--border); font-size:11px; color:var(--text-faint); display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; font-family:'Share Tech Mono',monospace;}
+  footer button{background:none; border:none; color:var(--text-faint); text-decoration:underline; cursor:pointer; font-size:11px; font-family:inherit;}
+</style>
+
+<div class="topbar">
+  <div class="brand">
+    <h1>MakeMyPC</h1>
+    <p>Gaming-PC planen &amp; vergleichen: AMD, Intel und Nvidia. Preise eintragen, CPU/GPU-Bottleneck prüfen, Netzteil-Watt berechnen, FPS schätzen.</p>
+  </div>
+  <div class="budgetbox">
+    <div class="field">
+      <label for="budgetInput">Budget-Limit</label>
+      <input type="number" id="budgetInput" min="0" step="10">
+    </div>
+    <div class="totalpill cut cut-sm" id="totalPill">
+      <span class="amount tabular" id="totalAmount">–</span>
+      <span class="delta" id="totalDelta">–</span>
+    </div>
+  </div>
+</div>
+
+<div class="tabs" role="tablist" id="tabNav"></div>
+<main id="panel"></main>
+
+<footer>
+  <span id="seedNote"></span>
+  <button id="resetBtn" type="button">Auswahl zurücksetzen</button>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+(function(){
+"use strict";
+
+var APP_SEED_DATE = "2026-09-26";
+
+/* ---------------- reference data (static fallback / initial seed) ---------------- */
+/* board-partner variants: three curated real-world tiers per card/board – günstigste, Preis-Leistungs-Sieger (Wertungsanker) und Top-Leistung.
+   Preise sind absolute Werte je Variante (kein Aufschlag auf einen bereits gefundenen Preis), damit ein echter Fund
+   (z. B. über "Preis prüfen") nicht doppelt verrechnet wird. */
+function round2(x){ return Math.round(x*100)/100; }
+var GPU_TIERS = {
+  amd: [
+    {brand:"ASUS", suffix:"Prime", ratio:0.985, label:"Günstigste", note:"Einfacher Kühler, günstigster Einstieg in diesen Chip."},
+    {brand:"XFX", suffix:"Swift", ratio:1.00, label:"Preis-Leistungs-Sieger", note:"Bewährter Allrounder, gutes Verhältnis aus Preis und Kühlung."},
+    {brand:"Sapphire", suffix:"Nitro+", ratio:1.13, label:"Top-Leistung", note:"Größter Kühler, höchstes Werks-OC, leisester Betrieb."}
+  ],
+  nvidia: [
+    {brand:"ASUS", suffix:"Dual", ratio:0.96, label:"Günstigste", note:"Kompakter Kühler, günstigster Einstieg in diesen Chip."},
+    {brand:"MSI", suffix:"Gaming X", ratio:1.02, label:"Preis-Leistungs-Sieger", note:"Bewährter Allrounder, gute Kühlung."},
+    {brand:"Gigabyte", suffix:"Aorus Master", ratio:1.18, label:"Top-Leistung", note:"Premium-Kühler, höchstes Werks-OC."}
+  ],
+  intel: [
+    {brand:"ASUS", suffix:"Dual", ratio:0.97, label:"Günstigste", note:"Einfache Basisvariante."},
+    {brand:"Sparkle", suffix:"Titan", ratio:1.03, label:"Preis-Leistungs-Sieger", note:"Intels wichtigster Arc-Partner."},
+    {brand:"Gigabyte", suffix:"Gaming OC", ratio:1.12, label:"Top-Leistung", note:"Größerer Kühler, leiser."}
+  ]
+};
+var BOARD_TIERS = [
+  {brand:"MSI", suffix:"Pro", ratio:0.93, label:"Günstigste", note:"Solide Basisausstattung."},
+  {brand:"ASUS", suffix:"TUF Gaming", ratio:1.00, label:"Preis-Leistungs-Sieger", note:"Bessere Spannungsversorgung, teils mit WLAN."},
+  {brand:"Gigabyte", suffix:"Aorus Elite", ratio:1.15, label:"Top-Leistung", note:"Mehr Ausstattung, oft mehr M.2-Slots."}
+];
+function mkGpuModels(anchorPrice, fam){
+  return GPU_TIERS[fam].map(function(t){ return {brand:t.brand, suffix:t.suffix, label:t.label, note:t.note, price:round2(anchorPrice*t.ratio)}; });
+}
+function mkBoardModels(anchorPrice){
+  return BOARD_TIERS.map(function(t){ return {brand:t.brand, suffix:t.suffix, label:t.label, note:t.note, price:round2(anchorPrice*t.ratio)}; });
+}
+
+var CPUS = [
+  {id:"cpu-5600", category:"cpu", vendor:"amd", name:"Ryzen 5 5600", socket:"AM4", memType:"ddr4", cores:6, threads:12, tdp:65, index:52, price:105, note:"Günstigster Einstieg, nur mit DDR4-Board nutzbar."},
+  {id:"cpu-5700x3d", category:"cpu", vendor:"amd", name:"Ryzen 7 5700X3D", socket:"AM4", memType:"ddr4", cores:8, threads:16, tdp:105, index:70, price:195, note:"3D-Cache auf AM4, gutes Gaming-Preis/Leistungs-Verhältnis."},
+  {id:"cpu-5800x3d", category:"cpu", vendor:"amd", name:"Ryzen 7 5800X3D", socket:"AM4", memType:"ddr4", cores:8, threads:16, tdp:105, index:75, price:225, note:"Letzter starker AM4-Gaming-Chip, kein Aufrüstpfad mehr."},
+  {id:"cpu-7500f", category:"cpu", vendor:"amd", name:"Ryzen 5 7500F", socket:"AM5", memType:"ddr5", cores:6, threads:12, tdp:65, index:67, price:140, note:"Kein iGPU, sehr günstiger AM5-Einstieg."},
+  {id:"cpu-9600x", category:"cpu", vendor:"amd", name:"Ryzen 5 9600X", socket:"AM5", memType:"ddr5", cores:6, threads:12, tdp:65, index:76, price:210, note:"Guter Allrounder-Einstieg auf AM5."},
+  {id:"cpu-7700x", category:"cpu", vendor:"amd", name:"Ryzen 7 7700X", socket:"AM5", memType:"ddr5", cores:8, threads:16, tdp:105, index:80, price:280, note:"Mehr Kerne, ohne 3D-Cache."},
+  {id:"cpu-9700x", category:"cpu", vendor:"amd", name:"Ryzen 7 9700X", socket:"AM5", memType:"ddr5", cores:8, threads:16, tdp:65, index:82, price:330, note:"Effizient, 8 Kerne."},
+  {id:"cpu-7800x3d", category:"cpu", vendor:"amd", name:"Ryzen 7 7800X3D", socket:"AM5", memType:"ddr5", cores:8, threads:16, tdp:120, index:93, price:350, note:"Bestes Gaming-Preis/Leistungs-Verhältnis auf AM5."},
+  {id:"cpu-9800x3d", category:"cpu", vendor:"amd", name:"Ryzen 7 9800X3D", socket:"AM5", memType:"ddr5", cores:8, threads:16, tdp:120, index:100, price:480, note:"Schnellste Gaming-CPU im Feld – Referenzwert (Index 100)."},
+  {id:"cpu-9900x", category:"cpu", vendor:"amd", name:"Ryzen 9 9900X", socket:"AM5", memType:"ddr5", cores:12, threads:24, tdp:120, index:86, price:430, note:"Mehr Kerne, eher für Streaming/Produktivität."},
+  {id:"cpu-9950x3d", category:"cpu", vendor:"amd", name:"Ryzen 9 9950X3D", socket:"AM5", memType:"ddr5", cores:16, threads:32, tdp:170, index:99, price:650, note:"3D-Cache plus 16 Kerne, Gaming und Produktivität."},
+  {id:"cpu-i3-12100f", category:"cpu", vendor:"intel", name:"Core i3-12100F", socket:"LGA1700", memType:"ddr4", cores:4, threads:8, tdp:60, index:48, price:110, note:"Günstigster Intel-Einstieg, kein Übertakten."},
+  {id:"cpu-i5-12400f", category:"cpu", vendor:"intel", name:"Core i5-12400F", socket:"LGA1700", memType:"ddr4", cores:6, threads:12, tdp:65, index:58, price:130, note:"Solider Budget-Allrounder."},
+  {id:"cpu-i5-14600kf", category:"cpu", vendor:"intel", name:"Core i5-14600KF", socket:"LGA1700", memType:"ddr5", cores:14, threads:20, tdp:125, index:85, price:270, note:"Unlocked, starkes Gaming-Preis/Leistungs-Verhältnis."},
+  {id:"cpu-i7-14700kf", category:"cpu", vendor:"intel", name:"Core i7-14700KF", socket:"LGA1700", memType:"ddr5", cores:20, threads:28, tdp:125, index:90, price:380, note:"Viele Kerne, gut für Gaming und Multitasking."},
+  {id:"cpu-i9-14900kf", category:"cpu", vendor:"intel", name:"Core i9-14900KF", socket:"LGA1700", memType:"ddr5", cores:24, threads:32, tdp:125, index:94, price:480, note:"Sehr schnell, aber hoher Verbrauch unter Volllast."},
+  {id:"cpu-ultra5-245k", category:"cpu", vendor:"intel", name:"Core Ultra 5 245K", socket:"LGA1851", memType:"ddr5", cores:14, threads:14, tdp:125, index:83, price:300, note:"Neue Plattform (Arrow Lake), effizienter als 14. Gen."},
+  {id:"cpu-ultra7-265k", category:"cpu", vendor:"intel", name:"Core Ultra 7 265K", socket:"LGA1851", memType:"ddr5", cores:20, threads:20, tdp:125, index:88, price:420, note:"Neue Plattform (Arrow Lake), viele Kerne."}
+];
+var GPUS = [
+  {id:"gpu-6600", category:"gpu", vendor:"amd", name:"Radeon RX 6600", vram:8, tdp:132, index:40, price:210, note:"Einsteiger für Full HD.", models:mkGpuModels(210,"amd")},
+  {id:"gpu-6700xt", category:"gpu", vendor:"amd", name:"Radeon RX 6700 XT", vram:12, tdp:230, index:56, price:290, note:"Solide Full-HD/WQHD-Karte, ältere Generation.", models:mkGpuModels(290,"amd")},
+  {id:"gpu-6800xt", category:"gpu", vendor:"amd", name:"Radeon RX 6800 XT", vram:16, tdp:300, index:70, price:370, note:"Oft als Restposten günstig, hoher Verbrauch.", models:mkGpuModels(370,"amd")},
+  {id:"gpu-7600", category:"gpu", vendor:"amd", name:"Radeon RX 7600", vram:8, tdp:165, index:48, price:260, note:"Einsteiger, wenig VRAM.", models:mkGpuModels(260,"amd")},
+  {id:"gpu-7600xt", category:"gpu", vendor:"amd", name:"Radeon RX 7600 XT", vram:16, tdp:190, index:54, price:320, note:"16 GB VRAM zum günstigen Preis.", models:mkGpuModels(320,"amd")},
+  {id:"gpu-7700xt", category:"gpu", vendor:"amd", name:"Radeon RX 7700 XT", vram:12, tdp:245, index:66, price:420, note:"Guter WQHD-Einstieg.", models:mkGpuModels(420,"amd")},
+  {id:"gpu-7800xt", category:"gpu", vendor:"amd", name:"Radeon RX 7800 XT", vram:16, tdp:263, index:77, price:510, note:"Sehr gutes WQHD-Preis/Leistungs-Verhältnis.", models:mkGpuModels(510,"amd")},
+  {id:"gpu-7900xt", category:"gpu", vendor:"amd", name:"Radeon RX 7900 XT", vram:20, tdp:315, index:89, price:670, note:"Starke WQHD/4K-Karte.", models:mkGpuModels(670,"amd")},
+  {id:"gpu-7900xtx", category:"gpu", vendor:"amd", name:"Radeon RX 7900 XTX", vram:24, tdp:355, index:97, price:820, note:"Viel VRAM, älteres FSR ohne volles FSR 4.", models:mkGpuModels(820,"amd")},
+  {id:"gpu-9070", category:"gpu", vendor:"amd", name:"Radeon RX 9070", vram:16, tdp:220, index:87, price:640, note:"Effizient, volles FSR 4.", models:mkGpuModels(640,"amd")},
+  {id:"gpu-9070xt", category:"gpu", vendor:"amd", name:"Radeon RX 9070 XT", vram:16, tdp:304, index:100, price:779, note:"Bestes P/L in 4K, FSR 4 – Referenzwert (Index 100). Preis-Leistungs-Sieger-Preis ist dein eigener Fund (XFX Swift).", models:mkGpuModels(779,"amd"), defaultModel:1},
+  {id:"gpu-4060", category:"gpu", vendor:"nvidia", name:"GeForce RTX 4060", vram:8, tdp:115, index:50, price:375, note:"Einsteiger Full HD, DLSS 3.", models:mkGpuModels(375,"nvidia")},
+  {id:"gpu-4060ti16", category:"gpu", vendor:"nvidia", name:"GeForce RTX 4060 Ti 16GB", vram:16, tdp:160, index:58, price:525, note:"Mehr VRAM als die 8-GB-Version.", models:mkGpuModels(525,"nvidia")},
+  {id:"gpu-4070", category:"gpu", vendor:"nvidia", name:"GeForce RTX 4070", vram:12, tdp:200, index:72, price:675, note:"Guter WQHD-Allrounder, DLSS 3.", models:mkGpuModels(675,"nvidia")},
+  {id:"gpu-4070super", category:"gpu", vendor:"nvidia", name:"GeForce RTX 4070 Super", vram:12, tdp:220, index:80, price:750, note:"Spürbar schneller als die reguläre 4070.", models:mkGpuModels(750,"nvidia")},
+  {id:"gpu-4070tisuper", category:"gpu", vendor:"nvidia", name:"GeForce RTX 4070 Ti Super", vram:16, tdp:285, index:90, price:975, note:"Starke WQHD/4K-Karte.", models:mkGpuModels(975,"nvidia")},
+  {id:"gpu-4080super", category:"gpu", vendor:"nvidia", name:"GeForce RTX 4080 Super", vram:16, tdp:320, index:104, price:1249, note:"High-End, DLSS 3 Frame Generation.", models:mkGpuModels(1249,"nvidia")},
+  {id:"gpu-4090", category:"gpu", vendor:"nvidia", name:"GeForce RTX 4090", vram:24, tdp:450, index:130, price:2124, note:"Älteres Flaggschiff, meist über diesem Budget.", models:mkGpuModels(2124,"nvidia")},
+  {id:"gpu-5070", category:"gpu", vendor:"nvidia", name:"GeForce RTX 5070", vram:12, tdp:250, index:85, price:750, note:"Neue Generation, DLSS 4.", models:mkGpuModels(750,"nvidia")},
+  {id:"gpu-5070ti", category:"gpu", vendor:"nvidia", name:"GeForce RTX 5070 Ti", vram:16, tdp:300, index:102, price:1137, note:"Sehr gutes 4K-Preis/Leistungs-Verhältnis in der neuen Generation. Preis live verifiziert (PCGH, 11.09.2026).", models:mkGpuModels(1137,"nvidia")},
+  {id:"gpu-5080", category:"gpu", vendor:"nvidia", name:"GeForce RTX 5080", vram:16, tdp:360, index:118, price:1350, note:"High-End, DLSS 4 mit Multi Frame Generation. Preis live verifiziert (PCGH, 11.09.2026).", models:mkGpuModels(1350,"nvidia")},
+  {id:"gpu-5090", category:"gpu", vendor:"nvidia", name:"GeForce RTX 5090", vram:32, tdp:575, index:155, price:2750, note:"Enthusiasten-Flaggschiff, sprengt fast jedes Budget.", models:mkGpuModels(2750,"nvidia")},
+  {id:"gpu-arc-a750", category:"gpu", vendor:"intel", name:"Arc A750", vram:8, tdp:225, index:42, price:220, note:"Günstig, in älteren DX11-Titeln oft schwächer als der Index zeigt.", models:mkGpuModels(220,"intel")},
+  {id:"gpu-arc-a770", category:"gpu", vendor:"intel", name:"Arc A770 16GB", vram:16, tdp:225, index:48, price:280, note:"Viel VRAM für den Preis, Treiber am besten in DX12/Vulkan-Titeln.", models:mkGpuModels(280,"intel")},
+  {id:"gpu-arc-b570", category:"gpu", vendor:"intel", name:"Arc B570", vram:10, tdp:150, index:50, price:277, note:"Neue Battlemage-Generation, effizient, gutes DX12/Vulkan-Verhalten. Preis live verifiziert (Sept. 2026).", models:mkGpuModels(277,"intel")},
+  {id:"gpu-arc-b580", category:"gpu", vendor:"intel", name:"Arc B580", vram:12, tdp:190, index:57, price:319, note:"Bestes Preis/Leistungs-Verhältnis der Arc-Reihe, in DX11-Spielen (z. B. ältere Titel) manchmal hinter dem Index. Preis live verifiziert (Sept. 2026).", models:mkGpuModels(319,"intel")}
+];
+/* Preise Stand 26.09.2026, per WebSearch verifiziert bzw. auf Basis von ~16,5 EUR/GiB (DDR5) und
+   ~6,6 EUR/GiB (DDR4) hochgerechnet – die RAM-Krise 2026 hat die Preise binnen weniger Monate
+   auf teils das Vierfache getrieben (Quelle: 3dcenter.org Speicherkrise-Preisindex, PCGH). */
+var RAM = [
+  {id:"ram-ddr4-16-3600", category:"ram", brand:"Kingston", name:"Kingston Fury Beast 16 GB (2×8) DDR4-3600 CL17", memType:"ddr4", capacity:16, speed:3600, cl:17, price:105, note:"Für AM4- oder ältere Intel-Boards."},
+  {id:"ram-ddr4-32-3600", category:"ram", brand:"Kingston", name:"Kingston Fury Beast 32 GB (2×16) DDR4-3600 CL17", memType:"ddr4", capacity:32, speed:3600, cl:17, price:210, note:"Für AM4- oder ältere Intel-Boards."},
+  {id:"ram-ddr4-32-corsair", category:"ram", brand:"Corsair", name:"Corsair Vengeance LPX 32 GB (2×16) DDR4-3600 CL18", memType:"ddr4", capacity:32, speed:3600, cl:18, price:215, note:"Alternative zum Kingston-Kit, etwas lockerere Timings."},
+  {id:"ram-ddr5-16-6000", category:"ram", brand:"Kingston", name:"Kingston Fury Beast 16 GB (2×8) DDR5-6000 CL36 EXPO", memType:"ddr5", capacity:16, speed:6000, cl:36, price:264, note:"Günstiger DDR5-Einstieg – auch hier trifft die RAM-Krise 2026 den Preis."},
+  {id:"ram-ddr5-32-teamgroup", category:"ram", brand:"TeamGroup", name:"TeamGroup T-Force Vulcan 32 GB (2×16) DDR5-6000 CL38 EXPO", memType:"ddr5", capacity:32, speed:6000, cl:38, price:496, note:"Günstigste 32-GB-Option, lockerere Timings (CL38)."},
+  {id:"ram-ddr5-32-5600", category:"ram", brand:"Corsair", name:"Corsair Vengeance 32 GB (2×16) DDR5-5600 CL36 EXPO", memType:"ddr5", capacity:32, speed:5600, cl:36, price:512, note:"Niedrigerer Takt (5600 statt 6000), meist etwas günstiger."},
+  {id:"ram-ddr5-32-6000", category:"ram", brand:"G.Skill", name:"G.Skill Flare X5 32 GB (2×16) DDR5-6000 CL36 EXPO", memType:"ddr5", capacity:32, speed:6000, cl:36, price:529, note:"Sweet Spot für AM5 – Preis von dir live gefunden (Sept. 2026)."},
+  {id:"ram-ddr5-32-corsair-cl30", category:"ram", brand:"Corsair", name:"Corsair Vengeance 32 GB (2×16) DDR5-6000 CL30 EXPO", memType:"ddr5", capacity:32, speed:6000, cl:30, price:592, note:"Engere Timings (CL30) als die CL36-Kits, meist etwas teurer, minimal schneller."},
+  {id:"ram-ddr5-32-tridentz5", category:"ram", brand:"G.Skill", name:"G.Skill Trident Z5 Neo 32 GB (2×16) DDR5-6000 CL30 EXPO", memType:"ddr5", capacity:32, speed:6000, cl:30, price:608, note:"Premium-Kit, speziell für AMD EXPO abgestimmt."},
+  {id:"ram-ddr5-64-6000", category:"ram", brand:"Kingston", name:"Kingston Fury Beast 64 GB (2×32) DDR5-6000 CL36 EXPO", memType:"ddr5", capacity:64, speed:6000, cl:36, price:1056, note:"Für Streaming, Content-Erstellung oder KI-Nutzung."},
+  {id:"ram-ddr5-64-gskill", category:"ram", brand:"G.Skill", name:"G.Skill Flare X5 64 GB (2×32) DDR5-6000 CL36 EXPO", memType:"ddr5", capacity:64, speed:6000, cl:36, price:1056, note:"Alternative 64-GB-Option zum Kingston-Kit."}
+];
+var BOARDS = [
+  {id:"board-a520", category:"board", name:"A520 (Budget)", socket:"AM4", memType:"ddr4", chipset:"A520", price:65, note:"Kein Übertakten, sehr günstig.", models:mkBoardModels(65)},
+  {id:"board-b550", category:"board", name:"B550", socket:"AM4", memType:"ddr4", chipset:"B550", price:100, note:"Solide Ausstattung für AM4.", models:mkBoardModels(100)},
+  {id:"board-b650", category:"board", name:"B650 (Basis)", socket:"AM5", memType:"ddr5", chipset:"B650", price:130, note:"Guter AM5-Einstieg.", models:mkBoardModels(130)},
+  {id:"board-b650-wifi", category:"board", name:"B650 mit WiFi", socket:"AM5", memType:"ddr5", chipset:"B650", price:154.12, note:"WLAN/Bluetooth, gute Spannungsversorgung. Preis-Leistungs-Sieger-Preis ist dein eigener Fund.", models:mkBoardModels(154.12), defaultModel:1},
+  {id:"board-b850", category:"board", name:"B850", socket:"AM5", memType:"ddr5", chipset:"B850", price:190, note:"USB4, mehr M.2-Slots.", models:mkBoardModels(190)},
+  {id:"board-x870", category:"board", name:"X870 (High-End)", socket:"AM5", memType:"ddr5", chipset:"X870", price:260, note:"PCIe 5.0, beste Ausstattung.", models:mkBoardModels(260)},
+  {id:"board-b660-ddr4", category:"board", name:"B660 (DDR4)", socket:"LGA1700", memType:"ddr4", chipset:"B660", price:110, note:"Günstig, kein Übertakten.", models:mkBoardModels(110)},
+  {id:"board-b760-ddr5", category:"board", name:"B760 (DDR5)", socket:"LGA1700", memType:"ddr5", chipset:"B760", price:150, note:"Guter Mittelklasse-Chipsatz.", models:mkBoardModels(150)},
+  {id:"board-z790", category:"board", name:"Z790", socket:"LGA1700", memType:"ddr5", chipset:"Z790", price:220, note:"Übertaktbar, beste Ausstattung für 12.–14. Gen.", models:mkBoardModels(220)},
+  {id:"board-b860", category:"board", name:"B860", socket:"LGA1851", memType:"ddr5", chipset:"B860", price:180, note:"Für Core Ultra 200S (Arrow Lake).", models:mkBoardModels(180)},
+  {id:"board-z890", category:"board", name:"Z890 (High-End)", socket:"LGA1851", memType:"ddr5", chipset:"Z890", price:260, note:"High-End für Core Ultra 200S.", models:mkBoardModels(260)}
+];
+/* Preise Stand 26.09.2026. SN770 1TB live per WebSearch verifiziert (Geizhals, 13.09.2026: 248,84 EUR);
+   die übrigen Laufwerke sind anhand dieses Ankers hochgerechnet (SSD-Preise pro TB liegen laut
+   PCGH/ComputerBase 2026 krisenbedingt beim Vierfachen des Vorkrisenniveaus). */
+var STORAGE = [
+  {id:"storage-a400-480", category:"storage", name:"Kingston A400 480GB", interface:"SATA", capacity:480, price:72, note:"SATA, gut als Zweitlaufwerk oder für ältere Boards."},
+  {id:"storage-870evo-1tb", category:"storage", name:"Samsung 870 EVO 1TB", interface:"SATA", capacity:1000, price:180, note:"Bewährte SATA-SSD, breite Kompatibilität."},
+  {id:"storage-nv3-500", category:"storage", name:"Kingston NV3 500GB", interface:"PCIe4", capacity:500, price:110, note:"Günstiger Einstieg, reicht für Windows + wenige Spiele."},
+  {id:"storage-p3plus-1tb", category:"storage", name:"Crucial P3 Plus 1TB", interface:"PCIe4", capacity:1000, price:220, note:"Guter Basis-Speicher für Windows + Spielebibliothek."},
+  {id:"storage-sn770-1tb", category:"storage", name:"WD Black SN770 1TB", interface:"PCIe4", capacity:1000, price:248.84, note:"Beliebt fürs Gaming, gute Dauerlast. Preis live verifiziert."},
+  {id:"storage-990evoplus-1tb", category:"storage", name:"Samsung 990 EVO Plus 1TB", interface:"PCIe4/5", capacity:1000, price:290, note:"Hybrid-Controller, nutzt PCIe 5.0 teilweise."},
+  {id:"storage-t500-2tb", category:"storage", name:"Crucial T500 2TB", interface:"PCIe4", capacity:2000, price:480, note:"Schnelles PCIe-4.0-Laufwerk mit viel Platz."},
+  {id:"storage-sn850x-2tb", category:"storage", name:"WD Black SN850X 2TB", interface:"PCIe4", capacity:2000, price:540, note:"Premium-Gaming-SSD, sehr gute Temperaturen."},
+  {id:"storage-990pro-2tb", category:"storage", name:"Samsung 990 Pro 2TB", interface:"PCIe4", capacity:2000, price:560, note:"Referenz für PCIe-4.0-Performance."},
+  {id:"storage-9100pro-2tb", category:"storage", name:"Samsung 9100 Pro 2TB", interface:"PCIe5", capacity:2000, price:680, note:"Volles Tempo nur mit PCIe-5.0-M.2-Slot (z. B. X870/Z890)."},
+  {id:"storage-mp700pro-2tb", category:"storage", name:"Corsair MP700 Pro 2TB", interface:"PCIe5", capacity:2000, price:700, note:"PCIe 5.0, oft auch mit Heatsink-Variante erhältlich."}
+];
+var ALL = {cpu:CPUS, gpu:GPUS, ram:RAM, board:BOARDS, storage:STORAGE};
+function findItem(cat,id){ return ALL[cat].find(function(i){return i.id===id;}); }
+
+var VENDOR_LABEL = {amd:"AMD", intel:"Intel", nvidia:"Nvidia"};
+
+/* small inline line-art previews per category (no external images allowed in this sandbox) */
+var CATEGORY_ICON = {
+  cpu: '<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="18" y="18" width="28" height="28" rx="3"/><rect x="26" y="26" width="12" height="12" rx="1.5"/>'+
+    '<line x1="24" y1="8" x2="24" y2="18"/><line x1="32" y1="8" x2="32" y2="18"/><line x1="40" y1="8" x2="40" y2="18"/>'+
+    '<line x1="24" y1="46" x2="24" y2="56"/><line x1="32" y1="46" x2="32" y2="56"/><line x1="40" y1="46" x2="40" y2="56"/>'+
+    '<line x1="8" y1="24" x2="18" y2="24"/><line x1="8" y1="32" x2="18" y2="32"/><line x1="8" y1="40" x2="18" y2="40"/>'+
+    '<line x1="46" y1="24" x2="56" y2="24"/><line x1="46" y1="32" x2="56" y2="32"/><line x1="46" y1="40" x2="56" y2="40"/></svg>',
+  gpu: '<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="18" width="48" height="24" rx="4"/>'+
+    '<rect x="8" y="42" width="14" height="6" rx="1.5"/><circle cx="24" cy="30" r="7"/><circle cx="42" cy="30" r="7"/>'+
+    '<line x1="24" y1="30" x2="24" y2="30.1"/><line x1="42" y1="30" x2="42" y2="30.1"/><line x1="52" y1="14" x2="52" y2="18"/><line x1="46" y1="14" x2="46" y2="18"/></svg>',
+  ram: '<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="16" y="6" width="32" height="46" rx="3"/>'+
+    '<path d="M22 52 v6 h20 v-6" /><line x1="24" y1="14" x2="24" y2="22"/><line x1="32" y1="14" x2="32" y2="22"/><line x1="40" y1="14" x2="40" y2="22"/>'+
+    '<line x1="22" y1="30" x2="42" y2="30"/><line x1="22" y1="38" x2="42" y2="38"/></svg>',
+  board: '<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="8" width="52" height="48" rx="3"/>'+
+    '<rect x="14" y="16" width="16" height="16" rx="2"/><line x1="38" y1="16" x2="52" y2="16"/><line x1="38" y1="21" x2="52" y2="21"/><line x1="38" y1="26" x2="52" y2="26"/>'+
+    '<rect x="14" y="38" width="36" height="8" rx="1.5"/><line x1="14" y1="50" x2="50" y2="50"/></svg>',
+  storage: '<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="22" width="48" height="18" rx="2"/>'+
+    '<rect x="16" y="26" width="14" height="10" rx="1"/><rect x="34" y="26" width="10" height="10" rx="1"/>'+
+    '<line x1="10" y1="44" x2="10" y2="50"/><line x1="14" y1="44" x2="14" y2="50"/><line x1="18" y1="44" x2="18" y2="50"/><line x1="22" y1="44" x2="22" y2="50"/>'+
+    '<circle cx="50" cy="49" r="2.4"/></svg>'
+};
+
+var GAMES = [
+  {id:"div2", label:"The Division 2 (Ultra)", gpuBase1440:190, cpuCap:260},
+  {id:"destiny2", label:"Destiny 2 (Max)", gpuBase1440:200, cpuCap:280},
+  {id:"cyberpunk", label:"Cyberpunk 2077 (Ultra, ohne Raytracing)", gpuBase1440:100, cpuCap:150},
+  {id:"ror", label:"Ready or Not (Ultra)", gpuBase1440:95, cpuCap:135},
+  {id:"alanwake2", label:"Alan Wake 2 (Ultra + Path Tracing) – GPU-lastiger Vergleich", gpuBase1440:50, cpuCap:150}
+];
+var RES_GPU_MULT = {"1080p":1.45, "1440p":1.0, "4K":0.58};
+var RES_CPU_MULT = {"1080p":1.05, "1440p":1.0, "4K":0.93};
+var UPSCALE_MULT = {
+  "1080p":{native:1.0, quality:1.25, balanced:1.45, performance:1.7},
+  "1440p":{native:1.0, quality:1.35, balanced:1.6, performance:1.9},
+  "4K":{native:1.0, quality:1.5, balanced:1.8, performance:2.3}
+};
+var UPSCALE_LABEL = {native:"Nativ", quality:"FSR4/DLSS4 Qualität", balanced:"Ausgewogen", performance:"Leistung"};
+var PSU_TIERS = [450,550,650,750,850,1000,1200];
+var PSU_EXAMPLES = {
+  450:"be quiet! Pure Power 12 M 450W", 550:"Corsair RM550e / be quiet! Pure Power 12 M 550W",
+  650:"Corsair RM650e / be quiet! Pure Power 12 M 650W", 750:"Corsair RM750e / be quiet! Straight Power 12 750W",
+  850:"Corsair RM850e / Seasonic Focus GX-850", 1000:"Corsair RM1000e / Seasonic Focus GX-1000",
+  1200:"Corsair HX1200i / Seasonic Prime PX-1200"
+};
+
+var PACKAGES = [
+  {id:"pkg-einsteiger", name:"Einsteiger", blurb:"Solides Full-HD-Gaming zum kleinen Preis.", cpuId:"cpu-7500f", gpuId:"gpu-7600", ramId:"ram-ddr5-16-6000", boardId:"board-b650", storageId:"storage-nv3-500"},
+  {id:"pkg-pl-amd", name:"Preis-Leistung (AMD)", blurb:"Starkes WQHD-Gaming, reiner AMD-Unterbau.", cpuId:"cpu-9600x", gpuId:"gpu-9070", ramId:"ram-ddr5-32-5600", boardId:"board-b650-wifi", storageId:"storage-p3plus-1tb"},
+  {id:"pkg-pl-intel", name:"Preis-Leistung (Intel/Nvidia)", blurb:"Vergleichbare Leistung mit Intel-CPU und Nvidia-GPU.", cpuId:"cpu-i5-14600kf", gpuId:"gpu-4070super", ramId:"ram-ddr5-32-5600", boardId:"board-b760-ddr5", storageId:"storage-p3plus-1tb"},
+  {id:"pkg-ausgewogen", name:"Ausgewogen", blurb:"Sehr starkes WQHD/4K-Gaming mit viel Reserve.", cpuId:"cpu-7800x3d", gpuId:"gpu-9070xt", ramId:"ram-ddr5-32-6000", boardId:"board-b650-wifi", storageId:"storage-sn850x-2tb"},
+  {id:"pkg-highend", name:"High-End", blurb:"Maximale Gaming-Leistung, 4K mit hohen FPS.", cpuId:"cpu-9800x3d", gpuId:"gpu-5080", ramId:"ram-ddr5-32-6000", boardId:"board-x870", storageId:"storage-9100pro-2tb"}
+];
+
+/* ---------------- state ---------------- */
+var state = {
+  cpuId:"cpu-9600x", gpuId:"gpu-9070xt", ramId:"ram-ddr5-32-6000", boardId:"board-b650-wifi", storageId:"storage-sn770-1tb",
+  budget:1500, resolution:"1440p", upscale:"quality", extraWatts:50, tab:"overview", overrides:{}, modelSel:{},
+  cpuVendorFilter:"all", gpuVendorFilter:"all", cpuSort:"perf", gpuSort:"perf"
+};
+(function loadState(){
+  try{
+    var raw = localStorage.getItem("makemypc_v1");
+    if(raw){
+      var saved = JSON.parse(raw);
+      for(var k in saved){ if(Object.prototype.hasOwnProperty.call(state,k)) state[k]=saved[k]; }
+      if(!state.overrides) state.overrides = {};
+    }
+  }catch(e){ /* private mode / blocked storage: fall back to defaults */ }
+})();
+function saveState(){
+  try{ localStorage.setItem("makemypc_v1", JSON.stringify(state)); }catch(e){}
+}
+
+function getModel(item){
+  if(!item.models) return null;
+  var idx = (typeof state.modelSel[item.id]==="number") ? state.modelSel[item.id] : (item.defaultModel||0);
+  return item.models[idx] || item.models[0];
+}
+function overrideKeyFor(item, mo){ return mo ? (item.id+":"+item.models.indexOf(mo)) : item.id; }
+function getDisplayName(item){
+  var mo = getModel(item);
+  return mo ? item.name+" – "+mo.brand+" "+mo.suffix : item.name;
+}
+function getSearchName(item){
+  var mo = getModel(item);
+  return mo ? item.name+" "+mo.brand+" "+mo.suffix : item.name;
+}
+function getPrice(item){
+  var mo = getModel(item);
+  var key = overrideKeyFor(item, mo);
+  if(typeof state.overrides[key]==="number") return state.overrides[key];
+  return mo ? mo.price : item.price;
+}
+function getPriceDate(item){
+  return APP_SEED_DATE;
+}
+function isOverridden(item){ return typeof state.overrides[overrideKeyFor(item, getModel(item))]==="number"; }
+function valueScore(item){ return item.index / getPrice(item) * 1000; }
+
+function fmtEur(n){ return n.toLocaleString("de-DE",{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function searchUrl(name){ return "https://geizhals.de/?fs="+encodeURIComponent(name); }
+
+/* ---------------- derived ---------------- */
+function getCurrent(){
+  return {
+    cpu:findItem("cpu",state.cpuId), gpu:findItem("gpu",state.gpuId),
+    ram:findItem("ram",state.ramId), board:findItem("board",state.boardId),
+    storage:findItem("storage",state.storageId)
+  };
+}
+function currentTotal(){
+  var c = getCurrent();
+  return getPrice(c.cpu)+getPrice(c.gpu)+getPrice(c.ram)+getPrice(c.board)+getPrice(c.storage);
+}
+function pkgTotal(pkg){
+  return getPrice(findItem("cpu",pkg.cpuId))+getPrice(findItem("gpu",pkg.gpuId))+getPrice(findItem("ram",pkg.ramId))+getPrice(findItem("board",pkg.boardId))+getPrice(findItem("storage",pkg.storageId));
+}
+function estimate(cpu,gpu,cat,res,upscale){
+  upscale = upscale || "native";
+  var gpuFpsNative = cat.gpuBase1440 * (gpu.index/100) * RES_GPU_MULT[res];
+  var gpuFps = gpuFpsNative * UPSCALE_MULT[res][upscale];
+  var cpuCeil = cat.cpuCap * (cpu.index/100) * RES_CPU_MULT[res];
+  var effective = Math.min(gpuFps,cpuCeil);
+  var gpuBound = gpuFps <= cpuCeil;
+  var headroomPct = gpuBound ? Math.round((1-gpuFps/cpuCeil)*100) : Math.round((1-cpuCeil/gpuFps)*100);
+  return {gpuFps:gpuFps, cpuCeil:cpuCeil, effective:effective, gpuBound:gpuBound, headroomPct:Math.max(0,headroomPct)};
+}
+function psuCalc(){
+  var c = getCurrent();
+  var draw = c.cpu.tdp + c.gpu.tdp + 75 + state.extraWatts;
+  var recommended = Math.ceil(draw*1.3);
+  var tier = PSU_TIERS.find(function(t){return t>=recommended;}) || PSU_TIERS[PSU_TIERS.length-1];
+  return {draw:draw, recommended:recommended, tier:tier};
+}
+function boardsForCpu(cpu){ return BOARDS.filter(function(b){return b.socket===cpu.socket;}); }
+function ramForBoard(board){ return RAM.filter(function(r){return r.memType===board.memType;}); }
+
+/* ---------------- rendering ---------------- */
+var TABS = [
+  {id:"overview", label:"Übersicht"},
+  {id:"packages", label:"Pakete"},
+  {id:"config", label:"Konfigurator"},
+  {id:"bench", label:"FPS"},
+  {id:"psu", label:"Netzteil"}
+];
+function gotoTab(id){ state.tab=id; saveState(); render(); }
+
+function render(){
+  renderTopbar();
+  renderTabNav();
+  renderPanel();
+  document.getElementById("seedNote").textContent = "Preise sind Richtwerte, Stand "+APP_SEED_DATE+". Nutze „Preis prüfen“ oder trage deinen gefundenen Preis manuell ein.";
+}
+
+function renderTopbar(){
+  var b = document.getElementById("budgetInput");
+  if(document.activeElement!==b) b.value = state.budget;
+  var total = currentTotal();
+  var delta = state.budget - total;
+  document.getElementById("totalAmount").textContent = fmtEur(total)+" €";
+  var d = document.getElementById("totalDelta");
+  if(delta >= 0){
+    d.textContent = fmtEur(delta)+" € Puffer";
+    d.className = "delta status-ok";
+  } else {
+    d.textContent = fmtEur(Math.abs(delta))+" € über Budget";
+    d.className = "delta status-bad";
+  }
+}
+
+function renderTabNav(){
+  var nav = document.getElementById("tabNav");
+  nav.innerHTML = "";
+  TABS.forEach(function(t){
+    var btn = document.createElement("button");
+    btn.textContent = t.label;
+    btn.setAttribute("role","tab");
+    btn.setAttribute("aria-selected", state.tab===t.id ? "true":"false");
+    btn.addEventListener("click", function(){ state.tab=t.id; saveState(); render(); });
+    nav.appendChild(btn);
+  });
+}
+
+function card(item, selected, extraClass, showIndex, isBestValue){
+  var wrap = document.createElement("button");
+  wrap.type="button";
+  wrap.className = "card cut"+(selected?" selected":"")+(extraClass?" "+extraClass:"");
+  var price = getPrice(item);
+  var chips = "";
+  if(item.category==="cpu") chips = '<span class="chip">'+item.socket+'</span><span class="chip">'+item.cores+'C/'+item.threads+'T</span><span class="chip">'+item.tdp+'W</span>';
+  if(item.category==="gpu") chips = '<span class="chip">'+item.vram+' GB</span><span class="chip">'+item.tdp+'W</span>';
+  if(item.category==="ram") chips = '<span class="chip">'+item.memType.toUpperCase()+'-'+item.speed+'</span><span class="chip">'+item.capacity+' GB</span><span class="chip">CL'+item.cl+'</span>';
+  if(item.category==="board") chips = '<span class="chip">'+item.socket+'</span><span class="chip">'+item.chipset+'</span>';
+  if(item.category==="storage") chips = '<span class="chip">'+item.interface+'</span><span class="chip">'+(item.capacity>=1000 ? (item.capacity/1000)+" TB" : item.capacity+" GB")+'</span>';
+
+  var idxHtml = "";
+  if(showIndex){
+    var barClass = item.category==="cpu" ? "cpu":"gpu";
+    idxHtml = '<div class="idxbar-track"><div class="idxbar-fill '+barClass+'" style="width:'+Math.min(100,item.index)+'%"></div></div>';
+  }
+  var vendorTag = item.vendor ? '<span class="vendortag">'+VENDOR_LABEL[item.vendor]+'</span>' : "";
+  var displayName = getDisplayName(item);
+
+  wrap.innerHTML =
+    '<div class="toprow"><div class="nameblock"><span class="cardicon '+item.category+'">'+CATEGORY_ICON[item.category]+'</span><span class="name">'+displayName+'</span></div>'+vendorTag+'</div>'+
+    '<span class="chips">'+chips+'</span>'+
+    idxHtml+
+    (isBestValue ? '<span class="valuebadge">Bestes Preis/Leistungs-Verhältnis</span>' : "")+
+    '<span class="note">'+item.note+'</span>'+
+    '<span class="pricedate">Preis-Stand: '+getPriceDate(item)+(isOverridden(item)?" · eigener Preis":"")+'</span>';
+
+  var curModel = getModel(item);
+  if(item.models){
+    var picker = document.createElement("div"); picker.className="modelpicker";
+    var curIdx = item.models.indexOf(curModel);
+    item.models.forEach(function(mo, idx){
+      var b = document.createElement("button");
+      b.type="button"; b.textContent=mo.brand+" · "+fmtEur(mo.price)+" €";
+      b.setAttribute("aria-pressed", idx===curIdx ? "true":"false");
+      b.title = mo.brand+" "+mo.suffix+" ("+mo.label+") – "+mo.note;
+      b.addEventListener("click", function(e){ e.stopPropagation(); state.modelSel[item.id]=idx; saveState(); render(); });
+      picker.appendChild(b);
+    });
+    wrap.appendChild(picker);
+    var tierTag = document.createElement("span");
+    tierTag.className = "valuebadge";
+    tierTag.style.color = "var(--accent-gpu)"; tierTag.style.background="var(--accent-gpu-bg)"; tierTag.style.borderColor="var(--accent-gpu)";
+    tierTag.textContent = curModel.label;
+    wrap.appendChild(tierTag);
+  }
+
+  var priceRow = document.createElement("div");
+  priceRow.className = "pricerow";
+  var input = document.createElement("input");
+  input.type="number"; input.min="0"; input.step="0.01"; input.value=price;
+  input.addEventListener("click", function(e){ e.stopPropagation(); });
+  input.addEventListener("change", function(){
+    var v = parseFloat(input.value);
+    if(!isNaN(v) && v>=0){ state.overrides[overrideKeyFor(item, getModel(item))]=v; saveState(); render(); }
+  });
+  var eur = document.createElement("span"); eur.className="eur"; eur.textContent="€";
+  var link = document.createElement("a");
+  link.className="searchlink"; link.href=searchUrl(getSearchName(item)); link.target="_blank"; link.rel="noopener";
+  link.textContent="Preis prüfen ↗";
+  link.addEventListener("click", function(e){ e.stopPropagation(); });
+  priceRow.appendChild(input); priceRow.appendChild(eur); priceRow.appendChild(link);
+  if(isOverridden(item)){
+    var reset = document.createElement("button");
+    reset.type="button"; reset.className="resetbtn"; reset.textContent="zurücksetzen";
+    reset.addEventListener("click", function(e){ e.stopPropagation(); delete state.overrides[overrideKeyFor(item, getModel(item))]; saveState(); render(); });
+    priceRow.appendChild(reset);
+  }
+  wrap.appendChild(priceRow);
+
+  wrap.addEventListener("click", function(){ selectItem(item.category, item.id); });
+  return wrap;
+}
+
+function selectItem(cat, id){
+  if(cat==="cpu"){
+    state.cpuId = id;
+    var cpu = findItem("cpu", id);
+    var compatBoards = boardsForCpu(cpu);
+    var curBoard = findItem("board", state.boardId);
+    if(!compatBoards.some(function(b){return b.id===curBoard.id;})){
+      var nb = compatBoards[0]; if(nb) state.boardId = nb.id;
+    }
+    var board2 = findItem("board", state.boardId);
+    var compatRam = ramForBoard(board2);
+    var curRam = findItem("ram", state.ramId);
+    if(!compatRam.some(function(r){return r.id===curRam.id;})){
+      var nr = compatRam[0]; if(nr) state.ramId = nr.id;
+    }
+  } else if(cat==="gpu"){ state.gpuId=id; }
+  else if(cat==="board"){
+    state.boardId = id;
+    var board = findItem("board", id);
+    var compatRam2 = ramForBoard(board);
+    var curRam2 = findItem("ram", state.ramId);
+    if(!compatRam2.some(function(r){return r.id===curRam2.id;})){
+      var nr2 = compatRam2[0]; if(nr2) state.ramId = nr2.id;
+    }
+  }
+  else if(cat==="ram"){ state.ramId=id; }
+  else if(cat==="storage"){ state.storageId=id; }
+  saveState();
+  render();
+}
+
+function sortItems(list, mode){
+  var arr = list.slice();
+  if(mode==="value") arr.sort(function(a,b){ return valueScore(b)-valueScore(a); });
+  else if(mode==="perf") arr.sort(function(a,b){ return b.index-a.index; });
+  else if(mode==="price") arr.sort(function(a,b){ return getPrice(a)-getPrice(b); });
+  return arr;
+}
+
+function catBlock(title, items, cat, selectedId, showIndex, opts){
+  opts = opts || {};
+  var block = document.createElement("div");
+  block.className="catblock";
+  var header = document.createElement("div"); header.className="catheader";
+  var h = document.createElement("h2"); h.textContent=title; header.appendChild(h);
+
+  var controls = document.createElement("div"); controls.className="catcontrols";
+  var vendors = null, vendorFilterKey=null, sortKey=null;
+  if(cat==="cpu"){ vendors=["all","amd","intel"]; vendorFilterKey="cpuVendorFilter"; sortKey="cpuSort"; }
+  if(cat==="gpu"){ vendors=["all","amd","nvidia","intel"]; vendorFilterKey="gpuVendorFilter"; sortKey="gpuSort"; }
+
+  if(vendors){
+    var vf = document.createElement("div"); vf.className="vendorfilter";
+    vendors.forEach(function(v){
+      var b = document.createElement("button");
+      b.textContent = v==="all" ? "Alle" : VENDOR_LABEL[v];
+      b.setAttribute("aria-pressed", state[vendorFilterKey]===v ? "true":"false");
+      b.addEventListener("click", function(){ state[vendorFilterKey]=v; saveState(); render(); });
+      vf.appendChild(b);
+    });
+    controls.appendChild(vf);
+
+    var sel = document.createElement("select"); sel.className="sortselect";
+    [["default","Empfohlen"],["value","Beste Preis-Leistung"],["perf","Höchste Leistung"],["price","Günstigster Preis"]].forEach(function(o){
+      var opt = document.createElement("option"); opt.value=o[0]; opt.textContent=o[1];
+      if(state[sortKey]===o[0]) opt.selected=true;
+      sel.appendChild(opt);
+    });
+    sel.addEventListener("change", function(){ state[sortKey]=sel.value; saveState(); render(); });
+    controls.appendChild(sel);
+  }
+  header.appendChild(controls);
+  block.appendChild(header);
+
+  var grid = document.createElement("div"); grid.className="cardgrid";
+  var cpuSock = findItem("cpu", state.cpuId).socket;
+  var boardMem = findItem("board", state.boardId).memType;
+  var filtered = items;
+  if(cat==="ram") filtered = items.filter(function(i){return i.memType===boardMem;}).sort(function(a,b){ if(b.capacity!==a.capacity) return b.capacity-a.capacity; if(b.speed!==a.speed) return b.speed-a.speed; return a.cl-b.cl; });
+  if(cat==="board") filtered = items.filter(function(i){return i.socket===cpuSock;}).sort(function(a,b){return getPrice(b)-getPrice(a);});
+  if(cat==="cpu" && state.cpuVendorFilter!=="all") filtered = filtered.filter(function(i){return i.vendor===state.cpuVendorFilter;});
+  if(cat==="gpu" && state.gpuVendorFilter!=="all") filtered = filtered.filter(function(i){return i.vendor===state.gpuVendorFilter;});
+
+  var bestValueId = null;
+  if(cat==="cpu"||cat==="gpu"){
+    var byValue = items.slice().sort(function(a,b){return valueScore(b)-valueScore(a);});
+    bestValueId = byValue.length ? byValue[0].id : null;
+  }
+
+  var sortMode = cat==="cpu" ? state.cpuSort : (cat==="gpu" ? state.gpuSort : "default");
+  var ordered = (cat==="cpu"||cat==="gpu") ? sortItems(filtered, sortMode) : filtered;
+
+  ordered.forEach(function(item){
+    grid.appendChild(card(item, item.id===selectedId, cat==="cpu"?"cpu-sel":"", !!showIndex, item.id===bestValueId));
+  });
+  block.appendChild(grid);
+  return block;
+}
+
+function renderPanel(){
+  var panel = document.getElementById("panel");
+  panel.innerHTML = "";
+  var section = document.createElement("section");
+  section.setAttribute("role","tabpanel");
+
+  if(state.tab==="overview"){
+    section.appendChild(buildOverviewPanel());
+  }
+  if(state.tab==="packages"){
+    section.appendChild(buildPackagesPanel());
+  }
+  if(state.tab==="config"){
+    var info = document.createElement("div");
+    info.className="noticebar info";
+    info.textContent = "Der Leistungsindex ist herstellerübergreifend vergleichbar (relative Gaming-Leistung, kein synthetischer Benchmark). Radeon RX 9070 XT und Ryzen 7 9800X3D sind jeweils auf 100 normiert.";
+    section.appendChild(info);
+    section.appendChild(catBlock("Prozessor (CPU)", CPUS, "cpu", state.cpuId, true));
+    section.appendChild(catBlock("Grafikkarte (GPU)", GPUS, "gpu", state.gpuId, true));
+    section.appendChild(catBlock("Arbeitsspeicher (RAM)", RAM, "ram", state.ramId, false));
+    section.appendChild(catBlock("Speicher (SSD/NVMe)", STORAGE, "storage", state.storageId, false));
+    section.appendChild(catBlock("Mainboard", BOARDS, "board", state.boardId, false));
+    section.appendChild(buildSummaryCard());
+  }
+  if(state.tab==="psu"){
+    section.appendChild(buildPsuPanel());
+  }
+  if(state.tab==="bench"){
+    section.appendChild(buildResSelector());
+    section.appendChild(buildBenchPanel());
+  }
+  panel.appendChild(section);
+}
+
+function buildOverviewPanel(){
+  var c = getCurrent();
+  var total = currentTotal();
+  var delta = state.budget - total;
+  var pct = Math.max(0, Math.min(100, (total/state.budget)*100));
+  var psu = psuCalc();
+  var wrap = document.createElement("div");
+  wrap.style.display="flex"; wrap.style.flexDirection="column"; wrap.style.gap="16px";
+
+  var hero = document.createElement("div"); hero.className="herocard cut";
+  var partsHtml = ["cpu","gpu","ram","storage","board"].map(function(cat){
+    var item = c[cat];
+    return '<div class="heromini"><span class="cardicon '+cat+'">'+CATEGORY_ICON[cat]+'</span>'+
+      '<div class="herominitext"><span class="heromininame">'+getDisplayName(item)+'</span>'+
+      '<span class="herominiprice tabular">'+fmtEur(getPrice(item))+' €</span></div></div>';
+  }).join("");
+  var barColor = delta>=0 ? "var(--good)" : "var(--bad)";
+  hero.innerHTML =
+    '<div class="herotop"><h2 class="herolabel">Aktueller Build</h2>'+
+    '<button type="button" class="exportbtn" id="exportPdfBtn">Als PDF exportieren</button></div>'+
+    '<div class="heromgrid">'+partsHtml+'</div>'+
+    '<div class="budgetbar"><div class="budgetbar-fill" style="width:'+pct+'%; background:'+barColor+';"></div></div>'+
+    '<div class="budgetline"><span class="tabular">'+fmtEur(total)+' €</span><span class="'+(delta>=0?"status-ok":"status-bad")+' tabular">'+(delta>=0 ? (fmtEur(delta)+' € Puffer') : (fmtEur(Math.abs(delta))+' € über Budget'))+' (Limit '+fmtEur(state.budget)+' €)</span></div>'+
+    '<div class="exportstatus" id="exportStatus">Mit Specs, Preisen und Kauflinks (Geizhals-Suche).</div>';
+  wrap.appendChild(hero);
+  setTimeout(function(){ var btn=document.getElementById("exportPdfBtn"); if(btn) btn.addEventListener("click", onExportPdf); },0);
+
+  var quick = document.createElement("div"); quick.className="quickgrid";
+
+  var psuTile = document.createElement("div"); psuTile.className="quicktile cut";
+  psuTile.innerHTML = '<div class="quicklabel">Netzteil</div><div class="quickbig tabular">'+psu.tier+' W</div><div class="quicksub">Rechnerische Last ca. '+psu.draw+' W</div>';
+  var psuBtn = document.createElement("button"); psuBtn.type="button"; psuBtn.className="jumplink"; psuBtn.textContent="Details →";
+  psuBtn.addEventListener("click", function(){ gotoTab("psu"); });
+  psuTile.appendChild(psuBtn);
+  quick.appendChild(psuTile);
+
+  var ranked = GAMES.map(function(g){ return {g:g, r:estimate(c.cpu,c.gpu,g,state.resolution,state.upscale)}; }).sort(function(a,b){ return a.r.effective-b.r.effective; });
+  var worst = ranked[0];
+  var fpsTile = document.createElement("div"); fpsTile.className="quicktile cut";
+  fpsTile.innerHTML = '<div class="quicklabel">FPS · '+state.resolution+' · '+UPSCALE_LABEL[state.upscale]+'</div><div class="quickbig tabular">'+Math.round(worst.r.effective)+'</div><div class="quicksub">niedrigster Wert: '+worst.g.label+'</div>';
+  var fpsBtn = document.createElement("button"); fpsBtn.type="button"; fpsBtn.className="jumplink"; fpsBtn.textContent="Alle Spiele →";
+  fpsBtn.addEventListener("click", function(){ gotoTab("bench"); });
+  fpsTile.appendChild(fpsBtn);
+  quick.appendChild(fpsTile);
+
+  wrap.appendChild(quick);
+
+  var hint = document.createElement("div"); hint.className="noticebar info";
+  hint.innerHTML = 'Bauteile ändern → <button type="button" class="jumplink" id="jumpConfig">Konfigurator</button> &nbsp;·&nbsp; Fertige Vorlagen → <button type="button" class="jumplink" id="jumpPkg">Pakete</button>';
+  wrap.appendChild(hint);
+  setTimeout(function(){
+    var jc=document.getElementById("jumpConfig"); if(jc) jc.addEventListener("click", function(){ gotoTab("config"); });
+    var jp=document.getElementById("jumpPkg"); if(jp) jp.addEventListener("click", function(){ gotoTab("packages"); });
+  },0);
+
+  return wrap;
+}
+
+function buildPackagesPanel(){
+  var wrap = document.createElement("div");
+  wrap.style.display="flex"; wrap.style.flexDirection="column"; wrap.style.gap="14px";
+  var intro = document.createElement("div");
+  intro.className="noticebar info";
+  intro.textContent = "Fertige Zusammenstellungen als Startpunkt. „Paket übernehmen“ setzt CPU, GPU, RAM und Mainboard im Konfigurator, du kannst danach jedes Teil einzeln ändern.";
+  wrap.appendChild(intro);
+  var grid = document.createElement("div"); grid.className="pkggrid";
+  PACKAGES.forEach(function(pkg){
+    var cpu=findItem("cpu",pkg.cpuId), gpu=findItem("gpu",pkg.gpuId), ram=findItem("ram",pkg.ramId), board=findItem("board",pkg.boardId), storage=findItem("storage",pkg.storageId);
+    var total = pkgTotal(pkg);
+    var overBudget = total > state.budget;
+    var c = document.createElement("div"); c.className="pkgcard cut";
+    c.innerHTML =
+      '<h3>'+pkg.name+'</h3>'+
+      '<div class="blurb">'+pkg.blurb+'</div>'+
+      '<div class="parts">'+
+        '<span><b>CPU:</b> '+getDisplayName(cpu)+'</span>'+
+        '<span><b>GPU:</b> '+getDisplayName(gpu)+'</span>'+
+        '<span><b>RAM:</b> '+getDisplayName(ram)+'</span>'+
+        '<span><b>Speicher:</b> '+getDisplayName(storage)+'</span>'+
+        '<span><b>Board:</b> '+getDisplayName(board)+'</span>'+
+      '</div>'+
+      '<div class="total tabular '+(overBudget?"status-bad":"status-ok")+'">'+fmtEur(total)+' €</div>';
+    var btn = document.createElement("button");
+    btn.type="button"; btn.className="applybtn"; btn.textContent="Paket übernehmen";
+    btn.addEventListener("click", function(){
+      state.cpuId=pkg.cpuId; state.gpuId=pkg.gpuId; state.ramId=pkg.ramId; state.boardId=pkg.boardId;
+      state.tab="config"; saveState(); render();
+    });
+    c.appendChild(btn);
+    grid.appendChild(c);
+  });
+  wrap.appendChild(grid);
+  return wrap;
+}
+
+function buildSummaryCard(){
+  var c = getCurrent();
+  var div = document.createElement("div");
+  div.className="summarycard cut";
+  var html = '<div class="summarygrid">'+
+    item("CPU", getDisplayName(c.cpu))+item("GPU", getDisplayName(c.gpu))+item("RAM", getDisplayName(c.ram))+item("Speicher", getDisplayName(c.storage))+item("Mainboard", getDisplayName(c.board))+
+    '</div>'+
+    '<div class="exportrow"><button type="button" class="jumplink" id="jumpOverview">← Zur Übersicht &amp; PDF-Export</button></div>';
+  div.innerHTML = html;
+  setTimeout(function(){
+    var btn = document.getElementById("jumpOverview");
+    if(btn) btn.addEventListener("click", function(){ gotoTab("overview"); });
+  },0);
+  return div;
+  function item(k,v){ return '<div class="item"><span class="k">'+k+'</span><span class="v">'+v+'</span></div>'; }
+}
+
+function setExportStatus(msg){
+  var s = document.getElementById("exportStatus");
+  if(s) s.textContent = msg;
+}
+
+/* jsPDF's core fonts only cover WinAnsi – unicode dashes/arrows render as garbage glyphs, so every string
+   passed to the PDF is sanitized to plain ASCII first. */
+function pdfSafe(s){
+  return String(s)
+    .replace(/[–—]/g,"-")
+    .replace(/→/g,"->")
+    .replace(/[·•]/g,"-")
+    .replace(/[‘’]/g,"'")
+    .replace(/[“”]/g,'"')
+    .replace(/€/g,"EUR");
+}
+var PDF_BG = [8,8,11], PDF_YELLOW=[252,238,9], PDF_CYAN=[0,220,230], PDF_WHITE=[230,230,235], PDF_DIM=[130,130,145], PDF_MAGENTA=[255,42,109];
+
+function buildPdfDoc(){
+  var c = getCurrent();
+  var total = currentTotal();
+  var delta = state.budget - total;
+  var psu = psuCalc();
+  var doc = new window.jspdf.jsPDF();
+  var marginL = 16, marginR = 194, y = 22;
+
+  function paintBg(){
+    doc.setFillColor(PDF_BG[0],PDF_BG[1],PDF_BG[2]); doc.rect(0,0,210,297,"F");
+  }
+  function ensureSpace(lines){ if(y + lines*6 > 278){ doc.addPage(); paintBg(); y = 20; } }
+  function txt(s, x, yy, color, font, size){
+    doc.setFont(font||"courier", size&&size>13?"bold":"normal");
+    doc.setFontSize(size||10);
+    doc.setTextColor(color[0],color[1],color[2]);
+    doc.text(pdfSafe(s), x, yy);
+  }
+  function rule(color){
+    doc.setDrawColor(color[0],color[1],color[2]); doc.setLineWidth(0.6);
+    doc.line(marginL, y, marginR, y); y += 5;
+  }
+  function sectionTitle(t){
+    ensureSpace(4);
+    txt("// "+t, marginL, y, PDF_CYAN, "courier", 13); y += 3;
+    rule(PDF_MAGENTA); y += 3;
+  }
+  function partBlock(label, item, specLine){
+    ensureSpace(5);
+    txt("["+label+"]", marginL, y, PDF_YELLOW, "courier", 10);
+    txt(getDisplayName(item), marginL+26, y, PDF_WHITE, "courier", 10); y += 5.5;
+    txt(specLine, marginL+26, y, PDF_DIM, "courier", 9); y += 5.5;
+    txt("PREIS: "+fmtEur(getPrice(item))+" EUR  (Richtwert, Stand "+getPriceDate(item)+")", marginL+26, y, PDF_WHITE, "courier", 9); y += 5.5;
+    doc.setFont("courier","normal"); doc.setFontSize(9); doc.setTextColor(PDF_CYAN[0],PDF_CYAN[1],PDF_CYAN[2]);
+    doc.textWithLink("> KAUFLINK / PREIS PRUEFEN", marginL+26, y, {url: searchUrl(getSearchName(item))});
+    y += 9;
+  }
+
+  paintBg();
+  txt("MAKEMYPC", marginL, y, PDF_YELLOW, "courier", 22); y += 2;
+  doc.setDrawColor(PDF_YELLOW[0],PDF_YELLOW[1],PDF_YELLOW[2]); doc.setLineWidth(1.2); doc.line(marginL,y,marginR,y); y += 7;
+  txt("BUILD-ZUSAMMENFASSUNG", marginL, y, PDF_MAGENTA, "courier", 12); y += 7;
+  txt("Erstellt am "+new Date().toLocaleDateString("de-DE")+"  //  Budget-Limit: "+fmtEur(state.budget)+" EUR", marginL, y, PDF_DIM, "courier", 9); y += 10;
+
+  sectionTitle("DEINE KONFIGURATION");
+  partBlock("CPU", c.cpu, c.cpu.socket+" - "+c.cpu.cores+"C/"+c.cpu.threads+"T - "+c.cpu.tdp+" W");
+  partBlock("GPU", c.gpu, c.gpu.vram+" GB VRAM - "+c.gpu.tdp+" W");
+  partBlock("RAM", c.ram, c.ram.memType.toUpperCase()+"-"+c.ram.speed+" CL"+c.ram.cl+" - "+c.ram.capacity+" GB");
+  partBlock("SSD", c.storage, c.storage.interface+" - "+(c.storage.capacity>=1000 ? (c.storage.capacity/1000)+" TB" : c.storage.capacity+" GB"));
+  partBlock("BOARD", c.board, c.board.socket+" - "+c.board.chipset);
+
+  ensureSpace(4);
+  txt("GESAMTPREIS: "+fmtEur(total)+" EUR", marginL, y, PDF_YELLOW, "courier", 15); y += 6.5;
+  txt(delta>=0
+    ? (fmtEur(delta)+" EUR Puffer zum Budget-Limit von "+fmtEur(state.budget)+" EUR")
+    : (fmtEur(Math.abs(delta))+" EUR UEBER dem Budget-Limit von "+fmtEur(state.budget)+" EUR"),
+    marginL, y, delta>=0 ? [5,255,161] : [255,34,71], "courier", 10);
+  y += 11;
+
+  sectionTitle("NETZTEIL-EMPFEHLUNG");
+  txt("Rechnerische Last: "+psu.draw+" W  //  empfohlen mit Reserve: mind. "+psu.recommended+" W", marginL, y, PDF_WHITE, "courier", 10); y += 5.5;
+  txt("Empfohlene Klasse: "+psu.tier+" W  (z.B. "+psu.tier+"W-Modelle wie "+PSU_EXAMPLES[psu.tier]+")", marginL, y, PDF_WHITE, "courier", 10); y += 10;
+
+  sectionTitle("GESCHAETZTE FPS  ("+state.resolution+", "+UPSCALE_LABEL[state.upscale]+")");
+  GAMES.forEach(function(g){
+    var r = estimate(c.cpu, c.gpu, g, state.resolution, state.upscale);
+    ensureSpace(1);
+    txt(g.label, marginL, y, PDF_WHITE, "courier", 10);
+    txt("ca. "+Math.round(r.effective)+" FPS", marginR-30, y, PDF_CYAN, "courier", 10);
+    y += 5.8;
+  });
+  y += 5;
+
+  ensureSpace(8);
+  rule(PDF_DIM);
+  doc.setFont("courier","normal"); doc.setFontSize(7.5); doc.setTextColor(PDF_DIM[0],PDF_DIM[1],PDF_DIM[2]);
+  var disc = doc.splitTextToSize(pdfSafe("Preise sind Richtwerte, keine Live-Daten - vor dem Kauf pruefen. Kauflinks fuehren zu einer Geizhals-Suche nach dem Produktnamen, kein direkter Shop-Link. FPS-Werte sind eine Modellrechnung, keine echten Messwerte."), 178);
+  doc.text(disc, marginL, y);
+
+  return doc;
+}
+
+function onExportPdf(){
+  var btn = document.getElementById("exportPdfBtn");
+  if(btn) btn.disabled = true;
+  setExportStatus("PDF wird erstellt …");
+  if(!window.jspdf || !window.jspdf.jsPDF){
+    setExportStatus("PDF-Bibliothek konnte nicht geladen werden. Versuch es später erneut.");
+    if(btn) btn.disabled = false;
+    return;
+  }
+  if(!(window.claude && window.claude.use)){
+    setExportStatus("PDF-Speichern ist nur innerhalb von Claude verfügbar.");
+    if(btn) btn.disabled = false;
+    return;
+  }
+  /* Außerhalb der Claude-Sandbox (z. B. als eigenständig gehostete Seite) blockiert nichts einen
+     normalen Browser-Download – dort speichert jsPDF direkt. Nur innerhalb des Claude-Artifact-Viewers
+     braucht es die downloads-Capability, weil die Sandbox dort eigene Downloads unterbindet. */
+  if(!(window.claude && window.claude.use)){
+    try{
+      var doc = buildPdfDoc();
+      doc.save("makemypc-build.pdf");
+      setExportStatus("PDF gespeichert.");
+    }catch(e){ setExportStatus("PDF konnte nicht erstellt werden."); }
+    if(btn) btn.disabled = false;
+    return;
+  }
+
+  var blob;
+  try{ blob = buildPdfDoc().output("blob"); }
+  catch(e){ setExportStatus("PDF konnte nicht erstellt werden."); if(btn) btn.disabled=false; return; }
+
+  window.claude.use("downloads").then(function(downloads){
+    if(!downloads){ setExportStatus("Speichern ist in dieser Ansicht nicht verfügbar."); if(btn) btn.disabled=false; return; }
+    return downloads.save({filename:"makemypc-build.pdf", data:blob}).then(function(){
+      setExportStatus("PDF gespeichert.");
+      if(btn) btn.disabled = false;
+    });
+  }).catch(function(err){
+    var code = err && err.code;
+    if(code==="declined"){ setExportStatus("Speichern abgebrochen."); }
+    else { setExportStatus("Speichern fehlgeschlagen."); }
+    if(btn) btn.disabled = false;
+  });
+}
+
+function buildResSelector(){
+  var wrap = document.createElement("div");
+  wrap.style.display="flex"; wrap.style.flexWrap="wrap"; wrap.style.gap="10px"; wrap.style.alignItems="center";
+  var seg = document.createElement("div"); seg.className="seg";
+  ["1080p","1440p","4K"].forEach(function(r){
+    var b = document.createElement("button");
+    b.textContent=r; b.setAttribute("aria-pressed", state.resolution===r?"true":"false");
+    b.addEventListener("click", function(){ state.resolution=r; saveState(); render(); });
+    seg.appendChild(b);
+  });
+  wrap.appendChild(seg);
+  var seg2 = document.createElement("div"); seg2.className="seg";
+  ["native","quality","balanced","performance"].forEach(function(u){
+    var b = document.createElement("button");
+    b.textContent=UPSCALE_LABEL[u]; b.setAttribute("aria-pressed", state.upscale===u?"true":"false");
+    b.addEventListener("click", function(){ state.upscale=u; saveState(); render(); });
+    seg2.appendChild(b);
+  });
+  wrap.appendChild(seg2);
+  return wrap;
+}
+
+function buildPsuPanel(){
+  var c = getCurrent();
+  var calc = psuCalc();
+  var grid = document.createElement("div");
+  grid.className="psugrid";
+
+  var left = document.createElement("div"); left.className="psucard cut";
+  left.innerHTML =
+    '<div class="drawline"><span class="k">'+getDisplayName(c.cpu)+'</span><span class="v">'+c.cpu.tdp+' W</span></div>'+
+    '<div class="drawline"><span class="k">'+getDisplayName(c.gpu)+'</span><span class="v">'+c.gpu.tdp+' W</span></div>'+
+    '<div class="drawline"><span class="k">Mainboard, RAM, Lüfter, SSDs (Basis)</span><span class="v">75 W</span></div>'+
+    '<div class="drawline"><span class="k">Zusätzliche Komponenten</span><span class="v" id="extraWattVal">'+state.extraWatts+' W</span></div>'+
+    '<div class="slider"><input type="range" id="extraSlider" min="0" max="150" step="5" value="'+state.extraWatts+'">'+
+    '<div class="row"><span>zusätzliche Laufwerke / Lüfter / AIO</span><span>0–150 W</span></div></div>'+
+    '<div class="drawline" style="border-bottom:none;"><span class="k">Rechnerische Gesamtlast</span><span class="v">'+calc.draw+' W</span></div>';
+  grid.appendChild(left);
+
+  var right = document.createElement("div"); right.className="psucard cut";
+  right.innerHTML =
+    '<div style="font-size:12px;color:var(--text-dim);">Empfehlung mit ca. 30&nbsp;% Reserve (Effizienz-Sweetspot, Lastspitzen)</div>'+
+    '<div class="psubig tabular">'+calc.tier+' W</div>'+
+    '<div style="font-size:13px;color:var(--text-dim);">rechnerisch mind. '+calc.recommended+' W nötig, aufgerundet auf gängige Nennleistung</div>'+
+    '<div class="noticebar info">Beispielmodelle: '+PSU_EXAMPLES[calc.tier]+'</div>'+
+    (c.gpu.tdp>=250 ? '<div class="noticebar warn">Diese GPU zieht über 250 W – nimm ein Netzteil mit nativem PCIe-5.0-Stecker (12V-2x6) und 80+ Gold/ATX-3.x-Zertifizierung.</div>' : '')+
+    '<a class="searchlink" href="'+searchUrl(calc.tier+"W 80+ Gold Netzteil ATX 3.0")+'" target="_blank" rel="noopener">Netzteile in dieser Klasse suchen ↗</a>';
+  grid.appendChild(right);
+
+  var wrap = document.createElement("div");
+  wrap.appendChild(grid);
+  setTimeout(function(){
+    var slider = document.getElementById("extraSlider");
+    if(slider){
+      slider.addEventListener("input", function(){
+        state.extraWatts = parseInt(slider.value,10);
+        document.getElementById("extraWattVal").textContent = state.extraWatts+" W";
+        var d2 = psuCalc();
+        var big = document.querySelector(".psucard:last-child .psubig");
+        if(big) big.textContent = d2.tier+" W";
+      });
+      slider.addEventListener("change", function(){ saveState(); render(); });
+    }
+  },0);
+  return wrap;
+}
+
+function buildBenchPanel(){
+  var c = getCurrent();
+  var wrap = document.createElement("div");
+  wrap.style.display="flex"; wrap.style.flexDirection="column"; wrap.style.gap="14px";
+
+  var head = document.createElement("div");
+  head.style.fontSize="13px"; head.style.color="var(--text-dim)";
+  head.textContent = getDisplayName(c.cpu)+" + "+getDisplayName(c.gpu)+" · "+state.resolution+" · "+UPSCALE_LABEL[state.upscale];
+  wrap.appendChild(head);
+
+  var grid = document.createElement("div"); grid.className="fpsgrid";
+  var ranked = GAMES.map(function(g){ return {g:g, r:estimate(c.cpu,c.gpu,g,state.resolution,state.upscale)}; })
+    .sort(function(a,b){ return b.r.effective - a.r.effective; });
+  ranked.forEach(function(item){
+    var tile = document.createElement("div"); tile.className="fpstile cut";
+    tile.innerHTML =
+      '<div class="fpsnum tabular">'+Math.round(item.r.effective)+'<span class="fpsunit">FPS</span></div>'+
+      '<div class="fpsgame">'+item.g.label+'</div>';
+    grid.appendChild(tile);
+  });
+  wrap.appendChild(grid);
+
+  var disclaimer = document.createElement("div");
+  disclaimer.className="noticebar warn";
+  disclaimer.textContent = "Modellrechnung aus relativen Leistungs-Indizes, keine echten Messwerte – zur groben Einordnung. Reale FPS hängen zusätzlich von Spielversion, Treiber und Einstellungen ab.";
+  wrap.appendChild(disclaimer);
+  var sources = document.createElement("div");
+  sources.innerHTML = '<div style="font-size:12px;color:var(--text-dim);margin-bottom:6px;">Echte Benchmarks findest du hier:</div>'+
+    '<div class="sourcelist">'+
+    '<a href="https://www.computerbase.de/" target="_blank" rel="noopener">computerbase.de ↗</a>'+
+    '<a href="https://www.pcgameshardware.de/" target="_blank" rel="noopener">pcgameshardware.de ↗</a>'+
+    '<a href="https://www.techpowerup.com/review/" target="_blank" rel="noopener">techpowerup.com ↗</a>'+
+    '<a href="https://www.3dcenter.org/" target="_blank" rel="noopener">3dcenter.org ↗</a>'+
+    '</div>';
+  wrap.appendChild(sources);
+  return wrap;
+}
+
+/* ---------------- events ---------------- */
+document.getElementById("budgetInput").addEventListener("change", function(e){
+  var v = parseFloat(e.target.value);
+  if(!isNaN(v) && v>=0){ state.budget=v; saveState(); render(); }
+});
+document.getElementById("resetBtn").addEventListener("click", function(){
+  state = {cpuId:"cpu-9600x", gpuId:"gpu-9070xt", ramId:"ram-ddr5-32-6000", boardId:"board-b650-wifi", storageId:"storage-sn770-1tb",
+    budget:1500, resolution:"1440p", upscale:"quality", extraWatts:50, tab:state.tab, overrides:{}, modelSel:{},
+    cpuVendorFilter:"all", gpuVendorFilter:"all", cpuSort:"perf", gpuSort:"perf"};
+  saveState(); render();
+});
+
+/* ---------------- boot ---------------- */
+/* Alle Preise stecken direkt im Code (Stand siehe APP_SEED_DATE) – bewusst ohne Live-Datenbank,
+   damit die Seite ohne Einschränkung öffentlich geteilt werden kann. */
+function boot(){
+  render();
+}
+
+if(window.claude && window.claude.hot){
+  window.claude.hot.ready ? window.claude.hot.ready(boot) : boot();
+} else {
+  boot();
+}
+})();
+</script>
