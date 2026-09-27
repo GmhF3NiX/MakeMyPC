@@ -8,6 +8,8 @@
 
 Läuft komplett im Browser. Kein Login, kein Account, keine Installation.
 
+[☕ Unterstützen (PayPal)](https://www.paypal.com/paypalme/rapidr3dde) &nbsp;·&nbsp; [TikTok](https://www.tiktok.com/@rapidr3d) &nbsp;·&nbsp; [Webseite](https://rapidr3d.duckdns.org)
+
 </div>
 
 ---
