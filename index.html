@@ -1039,11 +1039,6 @@ function onExportPdf(){
     if(btn) btn.disabled = false;
     return;
   }
-  if(!(window.claude && window.claude.use)){
-    setExportStatus("PDF-Speichern ist nur innerhalb von Claude verfügbar.");
-    if(btn) btn.disabled = false;
-    return;
-  }
   /* Außerhalb der Claude-Sandbox (z. B. als eigenständig gehostete Seite) blockiert nichts einen
      normalen Browser-Download – dort speichert jsPDF direkt. Nur innerhalb des Claude-Artifact-Viewers
      braucht es die downloads-Capability, weil die Sandbox dort eigene Downloads unterbindet. */
