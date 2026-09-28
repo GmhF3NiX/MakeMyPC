@@ -289,7 +289,7 @@
 (function(){
 "use strict";
 
-var APP_SEED_DATE = "2026-09-27";
+var APP_SEED_DATE = "2026-09-28";
 
 /* ---------------- reference data (static fallback / initial seed) ---------------- */
 /* board-partner variants: three curated real-world tiers per card/board – günstigste, Preis-Leistungs-Sieger (Wertungsanker) und Top-Leistung.
@@ -357,7 +357,7 @@ var GPUS = [
   {id:"gpu-7900xtx", category:"gpu", vendor:"amd", name:"Radeon RX 7900 XTX", vram:24, tdp:355, index:97, price:820, note:"Viel VRAM, älteres FSR ohne volles FSR 4.", models:mkGpuModels(820,"amd")},
   {id:"gpu-9070", category:"gpu", vendor:"amd", name:"Radeon RX 9070", vram:16, tdp:220, index:87, price:640, note:"Effizient, volles FSR 4.", models:mkGpuModels(640,"amd")},
   {id:"gpu-9070xt", category:"gpu", vendor:"amd", name:"Radeon RX 9070 XT", vram:16, tdp:304, index:100, price:779, note:"Bestes P/L in 4K, FSR 4 – Referenzwert (Index 100). Preis-Leistungs-Sieger-Preis ist dein eigener Fund (XFX Swift).", models:mkGpuModels(779,"amd"), defaultModel:1},
-  {id:"gpu-4060", category:"gpu", vendor:"nvidia", name:"GeForce RTX 4060", vram:8, tdp:115, index:50, price:700, note:"Einsteiger Full HD, DLSS 3. Durch die Speicherkrise stark verteuert (fast verdoppelt) – live verifiziert (Geizhals, Sept. 2026).", models:mkGpuModels(700,"nvidia")},
+  {id:"gpu-4060", category:"gpu", vendor:"nvidia", name:"GeForce RTX 4060", vram:8, tdp:115, index:50, price:640, note:"Einsteiger Full HD, DLSS 3. Wird als auslaufendes Modell abverkauft, Preis wieder gefallen (Spanne ca. 520-675 EUR je nach Hersteller) – live verifiziert (Geizhals, 28.09.2026).", models:mkGpuModels(640,"nvidia")},
   {id:"gpu-4060ti16", category:"gpu", vendor:"nvidia", name:"GeForce RTX 4060 Ti 16GB", vram:16, tdp:160, index:58, price:525, note:"Mehr VRAM als die 8-GB-Version.", models:mkGpuModels(525,"nvidia")},
   {id:"gpu-4070", category:"gpu", vendor:"nvidia", name:"GeForce RTX 4070", vram:12, tdp:200, index:72, price:675, note:"Guter WQHD-Allrounder, DLSS 3.", models:mkGpuModels(675,"nvidia")},
   {id:"gpu-4070super", category:"gpu", vendor:"nvidia", name:"GeForce RTX 4070 Super", vram:12, tdp:220, index:80, price:750, note:"Spürbar schneller als die reguläre 4070.", models:mkGpuModels(750,"nvidia")},
@@ -404,18 +404,19 @@ var BOARDS = [
   {id:"board-b860", category:"board", name:"B860", socket:"LGA1851", memType:"ddr5", chipset:"B860", price:180, note:"Für Core Ultra 200S (Arrow Lake).", models:mkBoardModels(180)},
   {id:"board-z890", category:"board", name:"Z890 (High-End)", socket:"LGA1851", memType:"ddr5", chipset:"Z890", price:260, note:"High-End für Core Ultra 200S.", models:mkBoardModels(260)}
 ];
-/* Preise Stand 27.09.2026. SN770 1TB live per WebSearch verifiziert (Geizhals, 13.09.2026: 248,84 EUR);
-   Samsung 990 EVO Plus 1TB ebenfalls live verifiziert (Geizhals, Sept. 2026, ~150-180 EUR je nach
-   Händler); die übrigen Laufwerke sind anhand des SN770-Ankers hochgerechnet (SSD-Preise pro TB
-   steigen laut PCGH/ComputerBase 2026 weiter, krisenbedingt durch NAND-Knappheit – keine
-   Entspannung vor Ende 2026 erwartet). */
+/* Preise Stand 28.09.2026. SN770 1TB live per WebSearch verifiziert (Geizhals, 13.09.2026: 248,84 EUR);
+   Samsung 990 EVO Plus 1TB ebenfalls live verifiziert (PCGH SSD-Preise-Report, 28.09.2026: ~180 EUR,
+   Preis gegenüber Vorwoche gestiegen); die übrigen Laufwerke sind anhand des SN770-Ankers hochgerechnet
+   (SSD-Preise pro TB steigen laut PCGH/ComputerBase 2026 weiter, krisenbedingt durch NAND-Knappheit,
+   NAND-Hersteller lenken 70-80% der Produktion in Richtung KI-Rechenzentren – keine Entspannung vor
+   Ende 2026 erwartet). */
 var STORAGE = [
   {id:"storage-a400-480", category:"storage", name:"Kingston A400 480GB", interface:"SATA", capacity:480, price:72, note:"SATA, gut als Zweitlaufwerk oder für ältere Boards."},
   {id:"storage-870evo-1tb", category:"storage", name:"Samsung 870 EVO 1TB", interface:"SATA", capacity:1000, price:180, note:"Bewährte SATA-SSD, breite Kompatibilität."},
   {id:"storage-nv3-500", category:"storage", name:"Kingston NV3 500GB", interface:"PCIe4", capacity:500, price:110, note:"Günstiger Einstieg, reicht für Windows + wenige Spiele."},
   {id:"storage-p3plus-1tb", category:"storage", name:"Crucial P3 Plus 1TB", interface:"PCIe4", capacity:1000, price:220, note:"Guter Basis-Speicher für Windows + Spielebibliothek."},
   {id:"storage-sn770-1tb", category:"storage", name:"WD Black SN770 1TB", interface:"PCIe4", capacity:1000, price:248.84, note:"Beliebt fürs Gaming, gute Dauerlast. Preis live verifiziert."},
-  {id:"storage-990evoplus-1tb", category:"storage", name:"Samsung 990 EVO Plus 1TB", interface:"PCIe4/5", capacity:1000, price:165, note:"Hybrid-Controller, nutzt PCIe 5.0 teilweise. Preis nach unten korrigiert – live verifiziert (Geizhals, Sept. 2026, größere Preisspanne je Händler)."},
+  {id:"storage-990evoplus-1tb", category:"storage", name:"Samsung 990 EVO Plus 1TB", interface:"PCIe4/5", capacity:1000, price:180, note:"Hybrid-Controller, nutzt PCIe 5.0 teilweise. Preis durch NAND-Knappheit wieder gestiegen – live verifiziert (PCGH SSD-Preise-Report, 28.09.2026)."},
   {id:"storage-t500-2tb", category:"storage", name:"Crucial T500 2TB", interface:"PCIe4", capacity:2000, price:480, note:"Schnelles PCIe-4.0-Laufwerk mit viel Platz."},
   {id:"storage-sn850x-2tb", category:"storage", name:"WD Black SN850X 2TB", interface:"PCIe4", capacity:2000, price:540, note:"Premium-Gaming-SSD, sehr gute Temperaturen."},
   {id:"storage-990pro-2tb", category:"storage", name:"Samsung 990 Pro 2TB", interface:"PCIe4", capacity:2000, price:560, note:"Referenz für PCIe-4.0-Performance."},
