@@ -289,7 +289,7 @@
 (function(){
 "use strict";
 
-var APP_SEED_DATE = "2026-10-05";
+var APP_SEED_DATE = "2026-10-12";
 
 /* ---------------- reference data (static fallback / initial seed) ---------------- */
 /* board-partner variants: three curated real-world tiers per card/board – günstigste, Preis-Leistungs-Sieger (Wertungsanker) und Top-Leistung.
@@ -356,7 +356,7 @@ var GPUS = [
   {id:"gpu-7900xt", category:"gpu", vendor:"amd", name:"Radeon RX 7900 XT", vram:20, tdp:315, index:89, price:670, note:"Starke WQHD/4K-Karte.", models:mkGpuModels(670,"amd")},
   {id:"gpu-7900xtx", category:"gpu", vendor:"amd", name:"Radeon RX 7900 XTX", vram:24, tdp:355, index:97, price:820, note:"Viel VRAM, älteres FSR ohne volles FSR 4.", models:mkGpuModels(820,"amd")},
   {id:"gpu-9070", category:"gpu", vendor:"amd", name:"Radeon RX 9070", vram:16, tdp:220, index:87, price:640, note:"Effizient, volles FSR 4.", models:mkGpuModels(640,"amd")},
-  {id:"gpu-9070xt", category:"gpu", vendor:"amd", name:"Radeon RX 9070 XT", vram:16, tdp:304, index:100, price:720, note:"Bestes P/L in 4K, FSR 4 – Referenzwert (Index 100). Preis weiter gefallen, günstigste Custom-Designs ab ca. 720 EUR und damit unter 750 EUR – live verifiziert (PCGH-Preisvergleich, Aug./Sept. 2026).", models:mkGpuModels(720,"amd"), defaultModel:1},
+  {id:"gpu-9070xt", category:"gpu", vendor:"amd", name:"Radeon RX 9070 XT", vram:16, tdp:304, index:100, price:720, note:"Bestes P/L in 4K, FSR 4 – Referenzwert (Index 100). Günstigste Custom-Designs weiterhin um 720 EUR (PCGH-Preisvergleich: 719,90 EUR am 22.08.2026); im Oktober 2026 keine belastbaren neueren Einzelfunde, Preis seitdem stabil.", models:mkGpuModels(720,"amd"), defaultModel:1},
   {id:"gpu-4060", category:"gpu", vendor:"nvidia", name:"GeForce RTX 4060", vram:8, tdp:115, index:50, price:640, note:"Einsteiger Full HD, DLSS 3. Wird als auslaufendes Modell abverkauft, Preis wieder gefallen (Spanne ca. 520-675 EUR je nach Hersteller) – live verifiziert (Geizhals, 28.09.2026).", models:mkGpuModels(640,"nvidia")},
   {id:"gpu-4060ti16", category:"gpu", vendor:"nvidia", name:"GeForce RTX 4060 Ti 16GB", vram:16, tdp:160, index:58, price:525, note:"Mehr VRAM als die 8-GB-Version.", models:mkGpuModels(525,"nvidia")},
   {id:"gpu-4070", category:"gpu", vendor:"nvidia", name:"GeForce RTX 4070", vram:12, tdp:200, index:72, price:675, note:"Guter WQHD-Allrounder, DLSS 3.", models:mkGpuModels(675,"nvidia")},
@@ -373,11 +373,13 @@ var GPUS = [
   {id:"gpu-arc-b570", category:"gpu", vendor:"intel", name:"Arc B570", vram:10, tdp:150, index:50, price:277, note:"Neue Battlemage-Generation, effizient, gutes DX12/Vulkan-Verhalten. Preis live verifiziert (Sept. 2026).", models:mkGpuModels(277,"intel")},
   {id:"gpu-arc-b580", category:"gpu", vendor:"intel", name:"Arc B580", vram:12, tdp:190, index:57, price:319, note:"Bestes Preis/Leistungs-Verhältnis der Arc-Reihe, in DX11-Spielen (z. B. ältere Titel) manchmal hinter dem Index. Preis live verifiziert (Sept. 2026).", models:mkGpuModels(319,"intel")}
 ];
-/* Preise Stand 05.10.2026, per WebSearch erneut geprüft – Werte zur Vorwoche unverändert, da keine
-   belastbaren neuen Einzelpreise gefunden wurden, auf Basis von ~16,5 EUR/GiB (DDR5) und ~6,6 EUR/GiB
-   (DDR4) hochgerechnet. Die RAM-Krise 2026 hat die Preise binnen weniger Monate auf teils das Vierfache
-   getrieben (Quelle: 3dcenter.org Speicherkrise-Preisindex, PCGH) und hält unvermindert an: SK Hynix
-   rechnet laut PCGH (Okt. 2026) sogar erst bis Ende 2030 mit einer Entspannung des Engpasses. */
+/* Preise Stand 12.10.2026, per WebSearch erneut geprüft. Die RAM-Krise 2026 hält weiter unvermindert an
+   (keine Stabilisierung, keine Entspannung): laut 3dcenter.org Speicherkrise-Preisindex lagen DDR5-Kits
+   im Mai 2026 bereits 248-384% über dem Stand von Juli 2025, Gartner erwartet einen kombinierten
+   DRAM/SSD-Preisanstieg von bis zu 130% bis Ende 2026, SK Hynix rechnet laut PCGH (Okt. 2026) sogar erst
+   bis Ende 2030 mit einer Entspannung. Einzelpreis live verifiziert: Corsair Vengeance 32GB DDR5-6000
+   CL30 lag am 11.10.2026 auf Geizhals ab 599,66 EUR. Übrige Kits ohne belastbaren neuen Einzelfund,
+   weiterhin auf Basis von ~16,5 EUR/GiB (DDR5) und ~6,6 EUR/GiB (DDR4) hochgerechnet. */
 var RAM = [
   {id:"ram-ddr4-16-3600", category:"ram", brand:"Kingston", name:"Kingston Fury Beast 16 GB (2×8) DDR4-3600 CL17", memType:"ddr4", capacity:16, speed:3600, cl:17, price:105, note:"Für AM4- oder ältere Intel-Boards."},
   {id:"ram-ddr4-32-3600", category:"ram", brand:"Kingston", name:"Kingston Fury Beast 32 GB (2×16) DDR4-3600 CL17", memType:"ddr4", capacity:32, speed:3600, cl:17, price:289, note:"Für AM4- oder ältere Intel-Boards. Speicherkrise treibt DDR4-Preise weiter – live verifiziert (Geizhals, Sept. 2026)."},
@@ -386,7 +388,7 @@ var RAM = [
   {id:"ram-ddr5-32-teamgroup", category:"ram", brand:"TeamGroup", name:"TeamGroup T-Force Vulcan 32 GB (2×16) DDR5-6000 CL38 EXPO", memType:"ddr5", capacity:32, speed:6000, cl:38, price:496, note:"Günstigste 32-GB-Option, lockerere Timings (CL38)."},
   {id:"ram-ddr5-32-5600", category:"ram", brand:"Corsair", name:"Corsair Vengeance 32 GB (2×16) DDR5-5600 CL36 EXPO", memType:"ddr5", capacity:32, speed:5600, cl:36, price:512, note:"Niedrigerer Takt (5600 statt 6000), meist etwas günstiger."},
   {id:"ram-ddr5-32-6000", category:"ram", brand:"G.Skill", name:"G.Skill Flare X5 32 GB (2×16) DDR5-6000 CL36 EXPO", memType:"ddr5", capacity:32, speed:6000, cl:36, price:529, note:"Sweet Spot für AM5 – Preis von dir live gefunden (Sept. 2026)."},
-  {id:"ram-ddr5-32-corsair-cl30", category:"ram", brand:"Corsair", name:"Corsair Vengeance 32 GB (2×16) DDR5-6000 CL30 EXPO", memType:"ddr5", capacity:32, speed:6000, cl:30, price:592, note:"Engere Timings (CL30) als die CL36-Kits, meist etwas teurer, minimal schneller."},
+  {id:"ram-ddr5-32-corsair-cl30", category:"ram", brand:"Corsair", name:"Corsair Vengeance 32 GB (2×16) DDR5-6000 CL30 EXPO", memType:"ddr5", capacity:32, speed:6000, cl:30, price:599.66, note:"Engere Timings (CL30) als die CL36-Kits, meist etwas teurer, minimal schneller. Preis live verifiziert (Geizhals, 11.10.2026)."},
   {id:"ram-ddr5-32-tridentz5", category:"ram", brand:"G.Skill", name:"G.Skill Trident Z5 Neo 32 GB (2×16) DDR5-6000 CL30 EXPO", memType:"ddr5", capacity:32, speed:6000, cl:30, price:608, note:"Premium-Kit, speziell für AMD EXPO abgestimmt."},
   {id:"ram-ddr5-64-6000", category:"ram", brand:"Kingston", name:"Kingston Fury Beast 64 GB (2×32) DDR5-6000 CL36 EXPO", memType:"ddr5", capacity:64, speed:6000, cl:36, price:1056, note:"Für Streaming, Content-Erstellung oder KI-Nutzung."},
   {id:"ram-ddr5-64-gskill", category:"ram", brand:"G.Skill", name:"G.Skill Flare X5 64 GB (2×32) DDR5-6000 CL36 EXPO", memType:"ddr5", capacity:64, speed:6000, cl:36, price:1056, note:"Alternative 64-GB-Option zum Kingston-Kit."}
@@ -404,12 +406,13 @@ var BOARDS = [
   {id:"board-b860", category:"board", name:"B860", socket:"LGA1851", memType:"ddr5", chipset:"B860", price:180, note:"Für Core Ultra 200S (Arrow Lake).", models:mkBoardModels(180)},
   {id:"board-z890", category:"board", name:"Z890 (High-End)", socket:"LGA1851", memType:"ddr5", chipset:"Z890", price:260, note:"High-End für Core Ultra 200S.", models:mkBoardModels(260)}
 ];
-/* Preise Stand 05.10.2026, per WebSearch erneut geprüft – Einzelpreise zur Vorwoche unverändert, da
+/* Preise Stand 12.10.2026, per WebSearch erneut geprüft – Einzelpreise zur Vorwoche unverändert, da
    keine belastbaren aktuelleren Funde vorliegen (SN770 1TB zuletzt Geizhals, 13.09.2026: 248,84 EUR;
    Samsung 990 EVO Plus 1TB zuletzt PCGH SSD-Preise-Report, 28.09.2026: ~180 EUR). Die übrigen Laufwerke
-   sind weiterhin anhand des SN770-Ankers hochgerechnet. Die NAND-Knappheit hält laut Kioxia/Phison
-   (Okt. 2026) weiter an – NAND-Hersteller lenken 70-80% der Produktion in Richtung KI-Rechenzentren,
-   laut Phison-CEO ist das aktuelle Preisniveau "der Boden für die nächsten vier Jahre". */
+   sind weiterhin anhand des SN770-Ankers hochgerechnet. Die NAND-Knappheit hält weiter an und zeigt keine
+   Entspannung: ComputerBase beziffert den Anstieg bei 1-TB-NVMe-SSDs seit Herbst 2025 auf teils über
+   180%, Gartner erwartet einen kombinierten DRAM/SSD-Preisanstieg von bis zu 130% bis Ende 2026. Laut
+   Phison-CEO ist das aktuelle Preisniveau "der Boden für die nächsten vier Jahre". */
 var STORAGE = [
   {id:"storage-a400-480", category:"storage", name:"Kingston A400 480GB", interface:"SATA", capacity:480, price:72, note:"SATA, gut als Zweitlaufwerk oder für ältere Boards."},
   {id:"storage-870evo-1tb", category:"storage", name:"Samsung 870 EVO 1TB", interface:"SATA", capacity:1000, price:180, note:"Bewährte SATA-SSD, breite Kompatibilität."},
